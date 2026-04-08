@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-garage-900 text-garage-100;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-garage-800;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-garage-600 rounded;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent hover:bg-accent-dark text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  .btn-secondary {
+    @apply bg-garage-700 hover:bg-garage-600 text-garage-100 font-semibold py-2 px-4 rounded-lg border border-garage-500 transition-colors duration-200;
+  }
+  .btn-danger {
+    @apply bg-red-700 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  .card {
+    @apply bg-garage-800 border border-garage-700 rounded-xl p-4 shadow-lg;
+  }
+  .input-field {
+    @apply bg-garage-700 border border-garage-600 text-garage-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent placeholder-garage-400;
+  }
+  .select-field {
+    @apply bg-garage-700 border border-garage-600 text-garage-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent;
+  }
+}

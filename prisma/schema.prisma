@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique @db.VarChar(100)
+  reference String   @db.VarChar(50) // Outils, Materiels, Consommables
+  createdAt DateTime @default(now())
+  items     Item[]
+
+  @@index([reference])
+}
+
+model Location {
+  id          Int      @id @default(autoincrement())
+  lieu        String   @db.VarChar(50) // Grange, Grange_etage, Garage, Cabane_jardin
+  emplacement String   @db.VarChar(10) // E0, E1, E2...
+  ligne       String   @db.VarChar(2)  // A, B, C...
+  colonne     Int      // 1, 2, 3...
+  createdAt   DateTime @default(now())
+  items       Item[]
+
+  @@unique([lieu, emplacement, ligne, colonne])
+  @@index([lieu])
+}
+
+model GridConfig {
+  id          Int      @id @default(autoincrement())
+  lieu        String   @db.VarChar(50)
+  emplacement String   @db.VarChar(10)
+  rows        Int
+  cols        Int
+  createdAt   DateTime @default(now())
+
+  @@unique([lieu, emplacement])
+}
+
+model Item {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(200)
+  reference   String     @db.VarChar(50) // Outils, Materiels, Consommables
+  photo       String?    @db.LongText    // Base64 encoded image
+  description String?    @db.Text
+  quantity    Int        @default(1)
+  unit        String     @default("unitaire") @db.VarChar(20) // unitaire, litre, metre
+  categoryId  Int
+  category    Category   @relation(fields: [categoryId], references: [id])
+  locationId  Int?
+  location    Location?  @relation(fields: [locationId], references: [id])
+  status      String     @default("actif") @db.VarChar(20) // actif, vendu, vide
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  history     Movement[]
+  loans       Loan[]
+
+  @@index([categoryId])
+  @@index([locationId])
+  @@index([reference])
+  @@index([status])
+}
+
+model Movement {
+  id          Int      @id @default(autoincrement())
+  itemId      Int
+  item        Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  type        String   @db.VarChar(30) // Ajout, Modif, Suppression, Pret, Rendu, Vendu, Vide
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  @@index([itemId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Loan {
+  id              Int       @id @default(autoincrement())
+  itemId          Int
+  item            Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  firstName       String    @db.VarChar(100)
+  lastName        String    @db.VarChar(100)
+  loanDate        DateTime  @default(now())
+  expectedReturn  DateTime
+  actualReturn    DateTime?
+  status          String    @default("en_cours") @db.VarChar(20) // en_cours, rendu
+  createdAt       DateTime  @default(now())
+
+  @@index([itemId])
+  @@index([status])
+}

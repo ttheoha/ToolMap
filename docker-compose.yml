@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: toolmap-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: toolmap_root_2024
+      MYSQL_DATABASE: toolmap
+      MYSQL_USER: toolmap
+      MYSQL_PASSWORD: toolmap_pass_2024
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --max_allowed_packet=64M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: toolmap-web
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    environment:
+      DATABASE_URL: mysql://toolmap:toolmap_pass_2024@db:3306/toolmap
+      NEXT_PUBLIC_BASE_URL: https://localhost
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
+    volumes:
+      - ./ssl:/app/ssl:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:

@@ -1,0 +1,5 @@
+node_modules/
+.next/
+ssl/
+*.pem
+.env.local
