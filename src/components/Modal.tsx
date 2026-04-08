@@ -35,9 +35,9 @@ export default function Modal({ isOpen, onClose, title, children, size = "md" }:
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div
         ref={ref}
-        className={`relative ${sizes[size]} w-full mx-4 bg-garage-800 border border-garage-600 rounded-xl shadow-2xl max-h-[90vh] overflow-y-auto`}
+        className={`relative ${sizes[size]} w-full mx-4 bg-garage-700 border border-garage-500 rounded-xl shadow-2xl max-h-[90vh] overflow-y-auto`}
       >
-        <div className="sticky top-0 bg-garage-800 border-b border-garage-700 px-6 py-4 flex items-center justify-between rounded-t-xl z-10">
+        <div className="sticky top-0 bg-garage-700 border-b border-garage-600 px-6 py-4 flex items-center justify-between rounded-t-xl z-10">
           <h2 className="text-lg font-bold text-garage-100">{title}</h2>
           <button
             onClick={onClose}

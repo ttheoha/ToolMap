@@ -64,9 +64,15 @@ export default function MovementLog({ reference }: { reference: string }) {
     </div>
   );
 
+  const exportCSV = (hidden: boolean) => {
+    const params = new URLSearchParams({ reference });
+    if (hidden) params.set("hidden", "true");
+    window.open(`/api/movements/export?${params}`, "_blank");
+  };
+
   return (
     <>
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <button onClick={() => setShowLog(true)} className="btn-secondary text-sm">
           Historique des mouvements
         </button>
@@ -76,12 +82,22 @@ export default function MovementLog({ reference }: { reference: string }) {
       </div>
 
       <Modal isOpen={showLog} onClose={() => setShowLog(false)} title="Historique des mouvements" size="xl">
-        <input placeholder="Filtrer..." value={search} onChange={e => setSearch(e.target.value)} className="input-field w-full mb-4" />
+        <div className="flex gap-3 mb-4">
+          <input placeholder="Filtrer..." value={search} onChange={e => setSearch(e.target.value)} className="input-field flex-1" />
+          <button onClick={() => exportCSV(false)} className="btn-secondary text-sm whitespace-nowrap">
+            Exporter CSV
+          </button>
+        </div>
         {renderMovements(movements)}
       </Modal>
 
       <Modal isOpen={showHidden} onClose={() => setShowHidden(false)} title="Historique masqué (Vendu / Vide)" size="xl">
-        <input placeholder="Filtrer..." value={searchHidden} onChange={e => setSearchHidden(e.target.value)} className="input-field w-full mb-4" />
+        <div className="flex gap-3 mb-4">
+          <input placeholder="Filtrer..." value={searchHidden} onChange={e => setSearchHidden(e.target.value)} className="input-field flex-1" />
+          <button onClick={() => exportCSV(true)} className="btn-secondary text-sm whitespace-nowrap">
+            Exporter CSV
+          </button>
+        </div>
         {renderMovements(hiddenMovements)}
       </Modal>
     </>

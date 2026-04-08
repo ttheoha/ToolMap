@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-garage-900 text-garage-100;
+    @apply bg-garage-700 text-garage-100;
   }
 
   ::-webkit-scrollbar {
@@ -30,12 +30,12 @@
     @apply bg-red-700 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200;
   }
   .card {
-    @apply bg-garage-800 border border-garage-700 rounded-xl p-4 shadow-lg;
+    @apply bg-garage-600 border border-garage-500 rounded-xl p-4 shadow-lg;
   }
   .input-field {
-    @apply bg-garage-700 border border-garage-600 text-garage-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent placeholder-garage-400;
+    @apply bg-garage-500 border border-garage-400 text-garage-50 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent placeholder-garage-300;
   }
   .select-field {
-    @apply bg-garage-700 border border-garage-600 text-garage-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent;
+    @apply bg-garage-500 border border-garage-400 text-garage-50 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent;
   }
 }

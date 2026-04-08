@@ -116,8 +116,46 @@ export default function GridPlan() {
     setShowAddItem(false);
   };
 
+  const [editingGrid, setEditingGrid] = useState<GridConfig | null>(null);
+  const [editRows, setEditRows] = useState(5);
+  const [editCols, setEditCols] = useState(5);
+
+  const handleEditGrid = (grid: GridConfig) => {
+    setEditingGrid(grid);
+    setEditRows(grid.rows);
+    setEditCols(grid.cols);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingGrid) return;
+    setGenerating(true);
+    await fetch(`/api/grid/${editingGrid.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rows: editRows, cols: editCols }),
+    });
+    setEditingGrid(null);
+    loadGrids();
+    setGenerating(false);
+  };
+
+  const handleDeleteGrid = async (grid: GridConfig) => {
+    if (!confirm(`Supprimer le plan "${grid.lieu} - ${grid.emplacement}" et tous ses casiers vides ?`)) return;
+    const res = await fetch(`/api/grid/${grid.id}`, { method: "DELETE" });
+    if (!res.ok) {
+      const data = await res.json();
+      alert(data.error || "Erreur lors de la suppression");
+      return;
+    }
+    if (emplacement === grid.emplacement) {
+      setEmplacement("E0");
+    }
+    loadGrids();
+  };
+
   // Available emplacements from existing grids
   const existingEmplacements = grids.map(g => g.emplacement);
+  const currentGrid = grids.find(g => g.emplacement === emplacement);
 
   return (
     <div className="space-y-6">
@@ -173,15 +211,27 @@ export default function GridPlan() {
       {/* Grid display */}
       {gridCells ? (
         <div className="card overflow-x-auto">
-          <h3 className="text-sm font-semibold text-garage-300 mb-4">
-            {lieu.replace("_", " ")} — {emplacement} ({gridCells.length} lignes × {gridCells[0]?.length || 0} colonnes)
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-garage-300">
+              {lieu.replace("_", " ")} — {emplacement} ({gridCells.length} lignes × {gridCells[0]?.length || 0} colonnes)
+            </h3>
+            {currentGrid && (
+              <div className="flex gap-2">
+                <button onClick={() => handleEditGrid(currentGrid)} className="btn-secondary text-sm">
+                  Modifier
+                </button>
+                <button onClick={() => handleDeleteGrid(currentGrid)} className="btn-danger text-sm">
+                  Supprimer
+                </button>
+              </div>
+            )}
+          </div>
           <div className="inline-block">
             {/* Column headers */}
             <div className="flex">
-              <div className="w-10 h-10 flex items-center justify-center text-xs text-garage-500 font-bold shrink-0" />
+              <div className="w-10 h-10 flex items-center justify-center text-xs text-garage-100 font-bold shrink-0" />
               {gridCells[0]?.map((_, ci) => (
-                <div key={ci} className="w-20 h-10 flex items-center justify-center text-xs text-garage-400 font-bold shrink-0">
+                <div key={ci} className="w-20 h-10 flex items-center justify-center text-xs text-garage-100 font-bold shrink-0">
                   {ci + 1}
                 </div>
               ))}
@@ -190,7 +240,7 @@ export default function GridPlan() {
             {/* Rows */}
             {gridCells.map((row, ri) => (
               <div key={ri} className="flex">
-                <div className="w-10 h-20 flex items-center justify-center text-xs text-garage-400 font-bold shrink-0">
+                <div className="w-10 h-20 flex items-center justify-center text-xs text-garage-100 font-bold shrink-0">
                   {String.fromCharCode(65 + ri)}
                 </div>
                 {row.map((cell, ci) => (
@@ -199,12 +249,12 @@ export default function GridPlan() {
                     onClick={() => handleCellClick(cell.ligne, cell.colonne, cell.locationId)}
                     className={`w-20 h-20 m-0.5 rounded-lg flex flex-col items-center justify-center text-xs transition-all hover:scale-105 shrink-0 ${
                       cell.hasItems
-                        ? "bg-blue-900/60 border-2 border-blue-500 text-blue-200 hover:bg-blue-800/60"
-                        : "bg-garage-700/40 border-2 border-dashed border-garage-600 text-garage-500 hover:border-garage-400"
+                        ? "bg-blue-900/60 border-2 border-blue-500 text-blue-100 hover:bg-blue-800/60"
+                        : "bg-garage-600/40 border-2 border-dashed border-garage-400 text-garage-200 hover:border-garage-300"
                     }`}
                   >
                     <span className="font-mono font-semibold">{emplacement}-{cell.ligne}{cell.colonne}</span>
-                    {cell.hasItems && <span className="text-[10px] mt-0.5 text-blue-400">occupé</span>}
+                    {cell.hasItems && <span className="text-[10px] mt-0.5 text-blue-300">occupé</span>}
                   </button>
                 ))}
               </div>
@@ -266,6 +316,45 @@ export default function GridPlan() {
                 />
               </div>
             )}
+          </div>
+        )}
+      </Modal>
+
+      {/* Edit grid modal */}
+      <Modal
+        isOpen={!!editingGrid}
+        onClose={() => setEditingGrid(null)}
+        title={editingGrid ? `Modifier ${editingGrid.lieu.replace("_", " ")} — ${editingGrid.emplacement}` : ""}
+      >
+        {editingGrid && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm text-garage-300 mb-1">Lieu</label>
+              <input value={editingGrid.lieu.replace("_", " ")} disabled className="input-field w-full opacity-50" />
+            </div>
+            <div>
+              <label className="block text-sm text-garage-300 mb-1">Emplacement</label>
+              <input value={editingGrid.emplacement} disabled className="input-field w-full opacity-50" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-garage-300 mb-1">Lignes (A-Z)</label>
+                <input type="number" min={1} max={26} value={editRows} onChange={e => setEditRows(Number(e.target.value))} className="input-field w-full" />
+              </div>
+              <div>
+                <label className="block text-sm text-garage-300 mb-1">Colonnes (1-N)</label>
+                <input type="number" min={1} max={50} value={editCols} onChange={e => setEditCols(Number(e.target.value))} className="input-field w-full" />
+              </div>
+            </div>
+            <p className="text-xs text-garage-500">
+              Les casiers hors de la nouvelle grille seront supprimés uniquement s'ils sont vides.
+            </p>
+            <div className="flex justify-end gap-3 pt-2">
+              <button onClick={() => setEditingGrid(null)} className="btn-secondary">Annuler</button>
+              <button onClick={handleSaveEdit} disabled={generating} className="btn-primary">
+                {generating ? "..." : "Enregistrer"}
+              </button>
+            </div>
           </div>
         )}
       </Modal>

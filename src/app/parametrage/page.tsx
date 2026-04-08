@@ -3,9 +3,10 @@
 import { useState } from "react";
 import CategoriesManager from "@/components/CategoriesManager";
 import GridPlan from "@/components/GridPlan";
+import BackupRestore from "@/components/BackupRestore";
 
 export default function ParametragePage() {
-  const [tab, setTab] = useState<"plan" | "categories">("plan");
+  const [tab, setTab] = useState<"plan" | "categories" | "backup">("plan");
 
   return (
     <div className="space-y-6">
@@ -28,10 +29,19 @@ export default function ParametragePage() {
         >
           Catégories
         </button>
+        <button
+          onClick={() => setTab("backup")}
+          className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${
+            tab === "backup" ? "bg-accent text-white" : "text-garage-400 hover:text-garage-200"
+          }`}
+        >
+          Sauvegarde / Restauration
+        </button>
       </div>
 
       {tab === "plan" && <GridPlan />}
       {tab === "categories" && <CategoriesManager />}
+      {tab === "backup" && <BackupRestore />}
     </div>
   );
 }
