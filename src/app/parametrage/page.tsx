@@ -3,10 +3,11 @@
 import { useState } from "react";
 import CategoriesManager from "@/components/CategoriesManager";
 import GridPlan from "@/components/GridPlan";
+import LocationsManager from "@/components/LocationsManager";
 import BackupRestore from "@/components/BackupRestore";
 
 export default function ParametragePage() {
-  const [tab, setTab] = useState<"plan" | "categories" | "backup">("plan");
+  const [tab, setTab] = useState<"plan" | "lieux" | "categories" | "backup">("plan");
 
   return (
     <div className="space-y-6">
@@ -20,6 +21,14 @@ export default function ParametragePage() {
           }`}
         >
           Plan 2D des casiers
+        </button>
+        <button
+          onClick={() => setTab("lieux")}
+          className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${
+            tab === "lieux" ? "bg-accent text-white" : "text-garage-400 hover:text-garage-200"
+          }`}
+        >
+          Lieux
         </button>
         <button
           onClick={() => setTab("categories")}
@@ -40,6 +49,7 @@ export default function ParametragePage() {
       </div>
 
       {tab === "plan" && <GridPlan />}
+      {tab === "lieux" && <LocationsManager />}
       {tab === "categories" && <CategoriesManager />}
       {tab === "backup" && <BackupRestore />}
     </div>

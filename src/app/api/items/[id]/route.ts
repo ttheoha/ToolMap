@@ -35,6 +35,11 @@ export async function PUT(
   if (body.quantity !== undefined && body.quantity !== existing.quantity) changes.push(`Quantité: ${existing.quantity} → ${body.quantity}`);
   if (body.categoryId && body.categoryId !== existing.categoryId) changes.push(`Catégorie modifiée`);
   if (body.locationId !== undefined && body.locationId !== existing.locationId) changes.push(`Emplacement modifié`);
+  if (body.photo !== undefined && body.photo !== existing.photo) {
+    if (!body.photo && existing.photo) changes.push(`Photo supprimée`);
+    else if (body.photo && !existing.photo) changes.push(`Photo ajoutée`);
+    else if (body.photo && existing.photo) changes.push(`Photo modifiée`);
+  }
 
   const item = await prisma.item.update({
     where: { id: itemId },
@@ -54,11 +59,14 @@ export async function PUT(
 
   if (body.status && body.status !== existing.status) {
     const typeMap: Record<string, string> = { vendu: "Vendu", vide: "Vide" };
+    const isRestock = body.status === "actif" && existing.status === "vide";
     await prisma.movement.create({
       data: {
         itemId,
-        type: typeMap[body.status] || "Modif",
-        description: `Statut changé vers "${body.status}"`,
+        type: isRestock ? "Reappro" : (typeMap[body.status] || "Modif"),
+        description: isRestock
+          ? `Réapprovisionné (quantité: ${body.quantity ?? existing.quantity})`
+          : `Statut changé vers "${body.status}"`,
       },
     });
   } else if (changes.length > 0) {

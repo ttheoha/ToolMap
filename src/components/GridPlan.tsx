@@ -5,7 +5,10 @@ import Modal from "./Modal";
 import ItemForm from "./ItemForm";
 import ImageZoom from "./ImageZoom";
 
-const LIEUX = ["Grange", "Grange_etage", "Garage", "Cabane_jardin"];
+interface LieuType {
+  id: number;
+  name: string;
+}
 
 interface GridConfig {
   id: number;
@@ -34,7 +37,8 @@ interface ItemInLocation {
 }
 
 export default function GridPlan() {
-  const [lieu, setLieu] = useState(LIEUX[0]);
+  const [lieuxList, setLieuxList] = useState<LieuType[]>([]);
+  const [lieu, setLieu] = useState("");
   const [emplacement, setEmplacement] = useState("E0");
   const [rows, setRows] = useState(5);
   const [cols, setCols] = useState(5);
@@ -48,7 +52,16 @@ export default function GridPlan() {
   const [cellLocationId, setCellLocationId] = useState<number | null>(null);
   const [showAddItem, setShowAddItem] = useState(false);
 
+  // Load lieux list
+  useEffect(() => {
+    fetch("/api/lieux").then(r => r.json()).then((data: LieuType[]) => {
+      setLieuxList(data);
+      if (data.length > 0 && !lieu) setLieu(data[0].name);
+    });
+  }, [lieu]);
+
   const loadGrids = useCallback(() => {
+    if (!lieu) return;
     fetch(`/api/grid?lieu=${lieu}`).then(r => r.json()).then(setGrids);
     fetch(`/api/locations?lieu=${lieu}`).then(r => r.json()).then(setLocations);
   }, [lieu]);
@@ -165,7 +178,7 @@ export default function GridPlan() {
           <div>
             <label className="block text-sm text-garage-300 mb-1">Lieu</label>
             <select value={lieu} onChange={e => setLieu(e.target.value)} className="select-field w-full">
-              {LIEUX.map(l => <option key={l} value={l}>{l.replace("_", " ")}</option>)}
+              {lieuxList.map(l => <option key={l.id} value={l.name}>{l.name}</option>)}
             </select>
           </div>
           <div>

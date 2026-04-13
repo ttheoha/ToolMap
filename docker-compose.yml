@@ -26,7 +26,7 @@ services:
     container_name: toolmap-web
     restart: unless-stopped
     ports:
-      - "443:443"
+      - "444:443"
     environment:
       DATABASE_URL: mysql://toolmap:toolmap_pass_2024@db:3306/toolmap
       NEXT_PUBLIC_BASE_URL: https://localhost

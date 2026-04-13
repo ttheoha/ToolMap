@@ -18,6 +18,8 @@ export default function MovementLog({ reference }: { reference: string }) {
   const [hiddenMovements, setHiddenMovements] = useState<Movement[]>([]);
   const [search, setSearch] = useState("");
   const [searchHidden, setSearchHidden] = useState("");
+  const [restockId, setRestockId] = useState<number | null>(null);
+  const [restockQty, setRestockQty] = useState(1);
 
   useEffect(() => {
     if (showLog) {
@@ -39,25 +41,69 @@ export default function MovementLog({ reference }: { reference: string }) {
     }
   }, [showHidden, searchHidden, reference]);
 
-  const renderMovements = (list: Movement[]) => (
+  const handleRestock = async (itemId: number) => {
+    if (restockQty < 1) return;
+    await fetch(`/api/items/${itemId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "actif", quantity: restockQty }),
+    });
+    setRestockId(null);
+    setRestockQty(1);
+    // Refresh hidden movements
+    const params = new URLSearchParams({ hidden: "true" });
+    if (searchHidden) params.set("search", searchHidden);
+    const data: Movement[] = await fetch(`/api/movements?${params}`).then(r => r.json());
+    setHiddenMovements(data.filter(m => m.item.reference === reference));
+  };
+
+  const renderMovements = (list: Movement[], isHidden = false) => (
     <div className="max-h-[60vh] overflow-y-auto space-y-1">
       {list.length === 0 ? (
         <p className="text-garage-500 text-sm text-center py-4">Aucun mouvement</p>
       ) : (
         list.map(m => (
-          <div key={m.id} className="flex items-center gap-3 text-sm bg-garage-700/50 rounded px-3 py-2">
-            <span className="text-garage-500 text-xs shrink-0 w-32">{new Date(m.createdAt).toLocaleString("fr-FR")}</span>
-            <span className="font-medium text-garage-200 shrink-0 w-32 truncate">{m.item.name}</span>
-            <span className={`px-1.5 py-0.5 rounded text-xs font-medium shrink-0 ${
-              m.type === "Ajout" ? "bg-green-900 text-green-300" :
-              m.type === "Suppression" ? "bg-red-900 text-red-300" :
-              m.type === "Pret" ? "bg-blue-900 text-blue-300" :
-              m.type === "Rendu" ? "bg-cyan-900 text-cyan-300" :
-              m.type === "Vendu" ? "bg-purple-900 text-purple-300" :
-              m.type === "Vide" ? "bg-yellow-900 text-yellow-300" :
-              "bg-garage-600 text-garage-200"
-            }`}>{m.type}</span>
-            <span className="text-garage-400 truncate">{m.description}</span>
+          <div key={m.id} className="bg-garage-700/50 rounded px-3 py-2">
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-garage-500 text-xs shrink-0 w-32">{new Date(m.createdAt).toLocaleString("fr-FR")}</span>
+              <span className="font-medium text-garage-200 shrink-0 w-32 truncate">{m.item.name}</span>
+              <span className={`px-1.5 py-0.5 rounded text-xs font-medium shrink-0 ${
+                m.type === "Ajout" ? "bg-green-900 text-green-300" :
+                m.type === "Suppression" ? "bg-red-900 text-red-300" :
+                m.type === "Pret" ? "bg-blue-900 text-blue-300" :
+                m.type === "Rendu" ? "bg-cyan-900 text-cyan-300" :
+                m.type === "Vendu" ? "bg-purple-900 text-purple-300" :
+                m.type === "Vide" ? "bg-yellow-900 text-yellow-300" :
+                "bg-garage-600 text-garage-200"
+              }`}>{m.type}</span>
+              <span className="text-garage-400 truncate flex-1">{m.description}</span>
+              {isHidden && m.type === "Vide" && m.item.status === "vide" && (
+                <button
+                  onClick={() => { setRestockId(restockId === m.item.id ? null : m.item.id); setRestockQty(1); }}
+                  className="btn-primary text-xs py-1 px-2 shrink-0"
+                >
+                  Réapprovisionné
+                </button>
+              )}
+            </div>
+            {isHidden && restockId === m.item.id && m.type === "Vide" && m.item.status === "vide" && (
+              <div className="flex items-center gap-2 mt-2 ml-32 pl-3">
+                <label className="text-xs text-garage-400">Quantité :</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={restockQty}
+                  onChange={e => setRestockQty(Number(e.target.value))}
+                  className="input-field w-20 text-sm"
+                />
+                <button onClick={() => handleRestock(m.item.id)} className="btn-primary text-xs py-1 px-3">
+                  Confirmer
+                </button>
+                <button onClick={() => setRestockId(null)} className="btn-secondary text-xs py-1 px-2">
+                  Annuler
+                </button>
+              </div>
+            )}
           </div>
         ))
       )}
@@ -98,7 +144,7 @@ export default function MovementLog({ reference }: { reference: string }) {
             Exporter CSV
           </button>
         </div>
-        {renderMovements(hiddenMovements)}
+        {renderMovements(hiddenMovements, true)}
       </Modal>
     </>
   );

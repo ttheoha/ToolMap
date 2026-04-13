@@ -17,6 +17,12 @@ model Category {
   @@index([reference])
 }
 
+model Lieu {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique @db.VarChar(50)
+  createdAt DateTime @default(now())
+}
+
 model Location {
   id          Int      @id @default(autoincrement())
   lieu        String   @db.VarChar(50) // Grange, Grange_etage, Garage, Cabane_jardin

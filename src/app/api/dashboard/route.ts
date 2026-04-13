@@ -2,20 +2,20 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  // Top 10 outils les plus utilisés (par nombre de mouvements)
+  // Top 5 outils les plus utilisés (par nombre de mouvements)
   const topOutils = await prisma.item.findMany({
     where: { reference: "Outils", status: "actif" },
     include: { _count: { select: { history: true } } },
     orderBy: { history: { _count: "desc" } },
-    take: 10,
+    take: 5,
   });
 
-  // Top 10 consommables
+  // Top 5 consommables
   const topConsommables = await prisma.item.findMany({
     where: { reference: "Consommables", status: "actif" },
     include: { _count: { select: { history: true } } },
     orderBy: { history: { _count: "desc" } },
-    take: 10,
+    take: 5,
   });
 
   // Prêts en cours

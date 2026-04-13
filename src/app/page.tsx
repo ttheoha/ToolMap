@@ -59,33 +59,33 @@ export default function DashboardPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card">
-          <h2 className="text-lg font-semibold mb-4 text-garage-200">Top 10 Outils utilisés</h2>
+          <h2 className="text-lg font-semibold mb-4 text-garage-200">Top 5 Outils utilisés</h2>
           {data.topOutils.length === 0 ? (
             <p className="text-garage-500 text-center py-8">Aucune donnée</p>
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={350}>
               <PieChart>
-                <Pie data={data.topOutils} cx="50%" cy="50%" outerRadius={100} dataKey="value" label={({ name, value }) => `${name} (${value})`}>
+                <Pie data={data.topOutils} cx="50%" cy="45%" outerRadius={90} dataKey="value" nameKey="name">
                   {data.topOutils.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: "#1c1917", border: "1px solid #44403c", borderRadius: "8px", color: "#e7e5e4" }} />
-                <Legend />
+                <Tooltip contentStyle={{ backgroundColor: "#1c1917", border: "1px solid #44403c", borderRadius: "8px", color: "#e7e5e4" }} formatter={(value: number, name: string) => [`${value} mouvements`, name]} />
+                <Legend wrapperStyle={{ paddingTop: "10px" }} />
               </PieChart>
             </ResponsiveContainer>
           )}
         </div>
         <div className="card">
-          <h2 className="text-lg font-semibold mb-4 text-garage-200">Top 10 Consommables</h2>
+          <h2 className="text-lg font-semibold mb-4 text-garage-200">Top 5 Consommables</h2>
           {data.topConsommables.length === 0 ? (
             <p className="text-garage-500 text-center py-8">Aucune donnée</p>
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={350}>
               <PieChart>
-                <Pie data={data.topConsommables} cx="50%" cy="50%" outerRadius={100} dataKey="value" label={({ name, value }) => `${name} (${value})`}>
+                <Pie data={data.topConsommables} cx="50%" cy="45%" outerRadius={90} dataKey="value" nameKey="name">
                   {data.topConsommables.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: "#1c1917", border: "1px solid #44403c", borderRadius: "8px", color: "#e7e5e4" }} />
-                <Legend />
+                <Tooltip contentStyle={{ backgroundColor: "#1c1917", border: "1px solid #44403c", borderRadius: "8px", color: "#e7e5e4" }} formatter={(value: number, name: string) => [`${value} mouvements`, name]} />
+                <Legend wrapperStyle={{ paddingTop: "10px" }} />
               </PieChart>
             </ResponsiveContainer>
           )}
