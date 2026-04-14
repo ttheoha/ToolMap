@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "1gb",
+    },
+  },
+};
+
 // Export full database as JSON
 export async function GET() {
   const [categories, items, locations, gridConfigs, movements, loans] = await Promise.all([

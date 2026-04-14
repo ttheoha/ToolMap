@@ -33,15 +33,22 @@ export default function BackupRestore() {
         body: JSON.stringify(backup),
       });
 
-      const data = await res.json();
+      const responseText = await res.text();
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        setMessage({ type: "error", text: `Erreur serveur (${res.status}): ${responseText.slice(0, 200)}` });
+        return;
+      }
 
       if (res.ok) {
         setMessage({ type: "success", text: "Restauration terminée avec succès. Rechargez la page." });
       } else {
         setMessage({ type: "error", text: data.error || "Erreur lors de la restauration" });
       }
-    } catch {
-      setMessage({ type: "error", text: "Fichier invalide ou erreur de lecture" });
+    } catch (err) {
+      setMessage({ type: "error", text: `Fichier invalide ou erreur de lecture : ${err instanceof Error ? err.message : String(err)}` });
     }
 
     setRestoring(false);
