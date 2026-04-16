@@ -95,6 +95,7 @@ export async function POST(request: NextRequest) {
         photo: (i.photo as string) || null,
         description: (i.description as string) || null,
         quantity: i.quantity as number,
+        minStock: (i.minStock as number) || null,
         unit: i.unit as string,
         categoryId: i.categoryId as number,
         locationId: (i.locationId as number) || null,

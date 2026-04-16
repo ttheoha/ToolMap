@@ -5,13 +5,18 @@ import CategoriesManager from "@/components/CategoriesManager";
 import GridPlan from "@/components/GridPlan";
 import LocationsManager from "@/components/LocationsManager";
 import BackupRestore from "@/components/BackupRestore";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function ParametragePage() {
   const [tab, setTab] = useState<"plan" | "lieux" | "categories" | "backup">("plan");
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl md:text-2xl font-bold text-accent">Paramétrage</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-xl md:text-2xl font-bold text-accent">Paramétrage</h1>
+      </div>
+
+      <ThemeToggle />
 
       <div className="flex gap-2 border-b border-garage-700 pb-2 overflow-x-auto">
         <button

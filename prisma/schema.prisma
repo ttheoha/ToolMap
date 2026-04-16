@@ -54,6 +54,7 @@ model Item {
   photo       String?    @db.LongText    // Base64 encoded image
   description String?    @db.Text
   quantity    Int        @default(1)
+  minStock    Int?       // Seuil de stock minimum (consommables uniquement)
   unit        String     @default("unitaire") @db.VarChar(20) // unitaire, litre, metre
   categoryId  Int
   category    Category   @relation(fields: [categoryId], references: [id])

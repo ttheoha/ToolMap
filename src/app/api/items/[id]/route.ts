@@ -33,6 +33,7 @@ export async function PUT(
 
   if (body.name && body.name !== existing.name) changes.push(`Nom: ${existing.name} → ${body.name}`);
   if (body.quantity !== undefined && body.quantity !== existing.quantity) changes.push(`Quantité: ${existing.quantity} → ${body.quantity}`);
+  if (body.minStock !== undefined && body.minStock !== existing.minStock) changes.push(`Stock mini: ${existing.minStock ?? "aucun"} → ${body.minStock ?? "aucun"}`);
   if (body.categoryId && body.categoryId !== existing.categoryId) changes.push(`Catégorie modifiée`);
   if (body.locationId !== undefined && body.locationId !== existing.locationId) changes.push(`Emplacement modifié`);
   if (body.photo !== undefined && body.photo !== existing.photo) {
@@ -49,6 +50,7 @@ export async function PUT(
       photo: body.photo !== undefined ? body.photo : existing.photo,
       description: body.description !== undefined ? body.description : existing.description,
       quantity: body.quantity ?? existing.quantity,
+      minStock: body.minStock !== undefined ? body.minStock : existing.minStock,
       unit: body.unit ?? existing.unit,
       categoryId: body.categoryId ?? existing.categoryId,
       locationId: body.locationId !== undefined ? body.locationId : existing.locationId,
