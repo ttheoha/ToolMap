@@ -93,6 +93,20 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
     }
   };
 
+  const handleMarkEmpty = async () => {
+    if (!item) return;
+    if (!confirm("Mettre la quantité à 0 ?")) return;
+    await fetch(`/api/items/${item.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ quantity: 0 }),
+    });
+    const updated = await fetch(`/api/items/${item.id}`).then(r => r.json());
+    setItem(updated);
+    setEditQty(0);
+    onRefresh();
+  };
+
   const handleStockSave = async () => {
     if (!item) return;
     setSavingStock(true);
@@ -264,8 +278,8 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
             {item.reference === "Materiels" && (
               <button onClick={() => handleStatusChange("vendu")} className="btn-danger text-sm">Marquer Vendu</button>
             )}
-            {item.reference === "Consommables" && (
-              <button onClick={() => handleStatusChange("vide")} className="btn-danger text-sm">Marquer Vide</button>
+            {item.reference === "Consommables" && item.quantity > 0 && (
+              <button onClick={handleMarkEmpty} className="btn-danger text-sm">Marquer Vide</button>
             )}
           </div>
         )}

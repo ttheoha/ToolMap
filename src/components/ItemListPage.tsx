@@ -91,16 +91,19 @@ export default function ItemListPage({ reference, title }: Props) {
               <div className="flex gap-3">
                 <ImageZoom src={item.photo || ""} alt={item.name} />
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-sm truncate group-hover:text-accent transition-colors">{item.name}</h3>
-                  <p className="text-xs text-garage-400">{item.category.name}</p>
-                  <p className="text-xs text-garage-500 mt-1">{item.quantity} {item.unit}</p>
+                  <h3 className="font-semibold text-sm truncate group-hover:text-accent transition-colors text-garage-100">{item.name}</h3>
+                  <p className="text-xs text-garage-200">{item.category.name}</p>
+                  <p className="text-xs text-garage-300 mt-1">{item.quantity} {item.unit}</p>
                   {item._count.loans > 0 && (
                     <span className="text-xs bg-blue-900 text-blue-300 px-1.5 py-0.5 rounded mt-1 inline-block">Prêté</span>
+                  )}
+                  {item.quantity === 0 && item.reference === "Consommables" && (
+                    <span className="text-xs bg-red-900 text-red-300 px-1.5 py-0.5 rounded mt-1 inline-block">Vide</span>
                   )}
                 </div>
               </div>
               {item.location && (
-                <p className="text-xs text-garage-500 mt-2 border-t border-garage-700 pt-2">
+                <p className="text-xs text-garage-300 mt-2 border-t border-garage-700 pt-2">
                   {item.location.lieu} - {item.location.emplacement}-{item.location.ligne}{item.location.colonne}
                 </p>
               )}

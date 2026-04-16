@@ -118,7 +118,7 @@ export default function DashboardPage() {
                 <Pie data={data.topOutils} cx="50%" cy="45%" outerRadius={90} dataKey="value" nameKey="name">
                   {data.topOutils.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: "var(--g-800)", border: "1px solid var(--g-600)", borderRadius: "8px", color: "var(--g-100)" }} formatter={(value: number, name: string) => [`${value} mouvements`, name]} />
+                <Tooltip contentStyle={{ backgroundColor: "var(--g-800)", border: "1px solid var(--g-600)", borderRadius: "8px", color: "var(--g-50)" }} itemStyle={{ color: "var(--g-50)" }} labelStyle={{ color: "var(--g-50)" }} formatter={(value: number, name: string) => [`${value} mouvements`, name]} />
                 <Legend wrapperStyle={{ paddingTop: "10px", color: "var(--g-200)" }} />
               </PieChart>
             </ResponsiveContainer>
@@ -134,7 +134,7 @@ export default function DashboardPage() {
                 <Pie data={data.topConsommables} cx="50%" cy="45%" outerRadius={90} dataKey="value" nameKey="name">
                   {data.topConsommables.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: "var(--g-800)", border: "1px solid var(--g-600)", borderRadius: "8px", color: "var(--g-100)" }} formatter={(value: number, name: string) => [`${value} mouvements`, name]} />
+                <Tooltip contentStyle={{ backgroundColor: "var(--g-800)", border: "1px solid var(--g-600)", borderRadius: "8px", color: "var(--g-50)" }} itemStyle={{ color: "var(--g-50)" }} labelStyle={{ color: "var(--g-50)" }} formatter={(value: number, name: string) => [`${value} mouvements`, name]} />
                 <Legend wrapperStyle={{ paddingTop: "10px", color: "var(--g-200)" }} />
               </PieChart>
             </ResponsiveContainer>
