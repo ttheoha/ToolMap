@@ -25,6 +25,7 @@ interface ItemFormProps {
     name?: string;
     description?: string;
     quantity?: number;
+    minStock?: number | null;
     unit?: string;
     categoryId?: number;
     locationId?: number;
@@ -37,6 +38,7 @@ export default function ItemForm({ reference, onSave, onCancel, initial, presetL
   const [name, setName] = useState(initial?.name || "");
   const [description, setDescription] = useState(initial?.description || "");
   const [quantity, setQuantity] = useState(initial?.quantity || 1);
+  const [minStock, setMinStock] = useState<number | "">(initial?.minStock ?? "");
   const [unit, setUnit] = useState(initial?.unit || "unitaire");
   const [categoryId, setCategoryId] = useState<number | "">(initial?.categoryId || "");
   const [locationId, setLocationId] = useState<number | "">(presetLocationId || initial?.locationId || "");
@@ -69,6 +71,7 @@ export default function ItemForm({ reference, onSave, onCancel, initial, presetL
       reference,
       description,
       quantity,
+      minStock: minStock !== "" ? Number(minStock) : null,
       unit,
       categoryId: Number(categoryId),
       locationId: locationId ? Number(locationId) : null,
@@ -107,11 +110,24 @@ export default function ItemForm({ reference, onSave, onCancel, initial, presetL
           </select>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className={`grid grid-cols-1 ${reference === "Consommables" ? "sm:grid-cols-3" : "sm:grid-cols-2"} gap-4`}>
         <div>
           <label className="block text-sm text-garage-300 mb-1">Quantité</label>
           <input type="number" min={0} value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="input-field w-full" />
         </div>
+        {reference === "Consommables" && (
+          <div>
+            <label className="block text-sm text-garage-300 mb-1">Stock mini</label>
+            <input
+              type="number"
+              min={0}
+              value={minStock}
+              onChange={e => setMinStock(e.target.value === "" ? "" : Number(e.target.value))}
+              placeholder="Seuil d'alerte"
+              className="input-field w-full"
+            />
+          </div>
+        )}
         <div>
           <label className="block text-sm text-garage-300 mb-1">Unité</label>
           <select value={unit} onChange={e => setUnit(e.target.value)} className="select-field w-full">

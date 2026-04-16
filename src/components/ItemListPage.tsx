@@ -13,6 +13,7 @@ interface Item {
   photo: string | null;
   description: string | null;
   quantity: number;
+  minStock: number | null;
   unit: string;
   status: string;
   category: { id: number; name: string };
@@ -122,6 +123,7 @@ export default function ItemListPage({ reference, title }: Props) {
             name: editItem.name,
             description: editItem.description || "",
             quantity: editItem.quantity,
+            minStock: editItem.minStock,
             unit: editItem.unit,
             categoryId: editItem.category.id,
             locationId: editItem.location?.id,

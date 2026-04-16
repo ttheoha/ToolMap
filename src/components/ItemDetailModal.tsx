@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Modal from "./Modal";
 import ImageZoom from "./ImageZoom";
 
@@ -11,6 +11,7 @@ interface ItemDetail {
   photo: string | null;
   description: string | null;
   quantity: number;
+  minStock: number | null;
   unit: string;
   status: string;
   category: { id: number; name: string };
@@ -31,10 +32,19 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [expectedReturn, setExpectedReturn] = useState("");
+  const [savingPhoto, setSavingPhoto] = useState(false);
+  const [editQty, setEditQty] = useState<number>(0);
+  const [editMinStock, setEditMinStock] = useState<number | "">(0);
+  const [savingStock, setSavingStock] = useState(false);
+  const photoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (itemId) {
-      fetch(`/api/items/${itemId}`).then(r => r.json()).then(setItem);
+      fetch(`/api/items/${itemId}`).then(r => r.json()).then((data: ItemDetail) => {
+        setItem(data);
+        setEditQty(data.quantity);
+        setEditMinStock(data.minStock ?? "");
+      });
     } else {
       setItem(null);
     }
@@ -83,6 +93,64 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
     }
   };
 
+  const handleStockSave = async () => {
+    if (!item) return;
+    setSavingStock(true);
+    await fetch(`/api/items/${item.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        quantity: editQty,
+        minStock: editMinStock !== "" ? Number(editMinStock) : null,
+      }),
+    });
+    const updated = await fetch(`/api/items/${item.id}`).then(r => r.json());
+    setItem(updated);
+    setEditQty(updated.quantity);
+    setEditMinStock(updated.minStock ?? "");
+    onRefresh();
+    setSavingStock(false);
+  };
+
+  const stockChanged = item
+    ? editQty !== item.quantity || (editMinStock !== "" ? Number(editMinStock) : null) !== item.minStock
+    : false;
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !item) return;
+    setSavingPhoto(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const photo = reader.result as string;
+      await fetch(`/api/items/${item.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photo }),
+      });
+      const updated = await fetch(`/api/items/${item.id}`).then(r => r.json());
+      setItem(updated);
+      onRefresh();
+      setSavingPhoto(false);
+    };
+    reader.readAsDataURL(file);
+    if (photoRef.current) photoRef.current.value = "";
+  };
+
+  const handlePhotoDelete = async () => {
+    if (!item || !confirm("Supprimer la photo ?")) return;
+    setSavingPhoto(true);
+    await fetch(`/api/items/${item.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ photo: null }),
+    });
+    const updated = await fetch(`/api/items/${item.id}`).then(r => r.json());
+    setItem(updated);
+    onRefresh();
+    setSavingPhoto(false);
+  };
+
   if (!item) return null;
 
   return (
@@ -90,8 +158,29 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
       <div className="space-y-6">
         {/* Header info */}
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-          <div className="shrink-0">
+          <div className="shrink-0 space-y-2">
             <ImageZoom src={item.photo || ""} alt={item.name} />
+            <div className="flex gap-2 justify-center">
+              <button
+                type="button"
+                onClick={() => photoRef.current?.click()}
+                disabled={savingPhoto}
+                className="text-xs text-garage-400 hover:text-accent transition-colors"
+              >
+                {savingPhoto ? "..." : item.photo ? "Changer" : "Ajouter photo"}
+              </button>
+              {item.photo && (
+                <button
+                  type="button"
+                  onClick={handlePhotoDelete}
+                  disabled={savingPhoto}
+                  className="text-xs text-garage-400 hover:text-red-400 transition-colors"
+                >
+                  Supprimer
+                </button>
+              )}
+            </div>
+            <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
           </div>
           <div className="flex-1 space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
@@ -110,6 +199,63 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
             </div>
           </div>
         </div>
+
+        {/* Stock management (consommables) */}
+        {item.reference === "Consommables" && (
+          <div className="card space-y-3">
+            <h3 className="font-semibold text-sm text-accent">Gestion du stock</h3>
+            <div className="flex flex-wrap items-end gap-4">
+              <div>
+                <label className="block text-xs text-garage-300 mb-1">Quantité</label>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setEditQty(Math.max(0, editQty - 1))}
+                    className="w-8 h-8 rounded bg-garage-500 hover:bg-garage-400 text-garage-100 font-bold text-lg flex items-center justify-center transition-colors"
+                  >-</button>
+                  <input
+                    type="number"
+                    min={0}
+                    value={editQty}
+                    onChange={e => setEditQty(Math.max(0, Number(e.target.value)))}
+                    className="input-field w-20 text-center text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setEditQty(editQty + 1)}
+                    className="w-8 h-8 rounded bg-garage-500 hover:bg-garage-400 text-garage-100 font-bold text-lg flex items-center justify-center transition-colors"
+                  >+</button>
+                  <span className="text-sm text-garage-300 ml-1">{item.unit}</span>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-garage-300 mb-1">Stock mini</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={editMinStock}
+                  onChange={e => setEditMinStock(e.target.value === "" ? "" : Number(e.target.value))}
+                  placeholder="—"
+                  className="input-field w-20 text-center text-sm"
+                />
+              </div>
+              <button
+                onClick={handleStockSave}
+                disabled={savingStock || !stockChanged}
+                className="btn-primary text-sm py-1.5 px-4"
+              >
+                {savingStock ? "..." : "Enregistrer"}
+              </button>
+            </div>
+            {item.minStock !== null && (
+              <p className={`text-xs font-medium ${item.quantity <= item.minStock ? "text-red-400" : "text-green-400"}`}>
+                {item.quantity <= item.minStock
+                  ? `Stock bas (${item.quantity}/${item.minStock} ${item.unit})`
+                  : `Stock OK (${item.quantity}/${item.minStock} ${item.unit})`}
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Action buttons */}
         {item.status === "actif" && (

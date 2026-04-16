@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
       photo: body.photo || null,
       description: body.description || null,
       quantity: body.quantity || 1,
+      minStock: body.minStock !== undefined ? body.minStock : null,
       unit: body.unit || "unitaire",
       categoryId: body.categoryId,
       locationId: body.locationId || null,

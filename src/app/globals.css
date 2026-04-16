@@ -2,9 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --g-50: #f5f5f4;
+  --g-100: #e7e5e4;
+  --g-200: #d6d3d1;
+  --g-300: #a8a29e;
+  --g-400: #78716c;
+  --g-500: #57534e;
+  --g-600: #44403c;
+  --g-700: #292524;
+  --g-800: #1c1917;
+  --g-900: #0c0a09;
+  --g-950: #050403;
+}
+
+[data-theme="light"] {
+  --g-50: #1c1917;
+  --g-100: #292524;
+  --g-200: #44403c;
+  --g-300: #78716c;
+  --g-400: #a8a29e;
+  --g-500: #d6d3d1;
+  --g-600: #ffffff;
+  --g-700: #f0eeec;
+  --g-800: #f7f6f5;
+  --g-900: #fafaf9;
+  --g-950: #ffffff;
+}
+
 @layer base {
   body {
     @apply bg-garage-700 text-garage-100;
+    transition: background-color 0.3s, color 0.3s;
   }
 
   ::-webkit-scrollbar {

@@ -3,6 +3,16 @@
 import { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
+interface LowStockItem {
+  id: number;
+  name: string;
+  quantity: number;
+  minStock: number;
+  unit: string;
+  category: string;
+  location: string | null;
+}
+
 interface DashboardData {
   topOutils: { name: string; value: number }[];
   topConsommables: { name: string; value: number }[];
@@ -15,6 +25,7 @@ interface DashboardData {
     status: string;
     item: { id: number; name: string; reference: string };
   }[];
+  lowStockConsommables: LowStockItem[];
   stats: {
     totalItems: number;
     totalOutils: number;
@@ -56,6 +67,45 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      {/* Low stock consumables alert */}
+      {data.lowStockConsommables.length > 0 && (
+        <div className="card border-red-700/50">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-red-400 text-lg">&#9888;</span>
+            <h2 className="text-lg font-semibold text-red-400">Consommables en stock bas</h2>
+            <span className="text-xs bg-red-900 text-red-300 px-2 py-0.5 rounded-full font-medium">
+              {data.lowStockConsommables.length}
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-garage-700 text-garage-200">
+                  <th className="text-left py-2 px-3">Nom</th>
+                  <th className="text-left py-2 px-3">Catégorie</th>
+                  <th className="text-right py-2 px-3">Quantité</th>
+                  <th className="text-right py-2 px-3">Stock mini</th>
+                  <th className="text-left py-2 px-3">Emplacement</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.lowStockConsommables.map(item => (
+                  <tr key={item.id} className="border-b border-garage-700/50 hover:bg-garage-700/30">
+                    <td className="py-2 px-3 font-medium text-garage-100">{item.name}</td>
+                    <td className="py-2 px-3 text-garage-200">{item.category}</td>
+                    <td className={`py-2 px-3 text-right font-semibold ${item.quantity === 0 ? "text-red-400" : "text-yellow-400"}`}>
+                      {item.quantity} {item.unit}
+                    </td>
+                    <td className="py-2 px-3 text-right text-garage-200">{item.minStock} {item.unit}</td>
+                    <td className="py-2 px-3 text-garage-200">{item.location || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card">
@@ -68,8 +118,8 @@ export default function DashboardPage() {
                 <Pie data={data.topOutils} cx="50%" cy="45%" outerRadius={90} dataKey="value" nameKey="name">
                   {data.topOutils.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: "#1c1917", border: "1px solid #44403c", borderRadius: "8px", color: "#e7e5e4" }} formatter={(value: number, name: string) => [`${value} mouvements`, name]} />
-                <Legend wrapperStyle={{ paddingTop: "10px" }} />
+                <Tooltip contentStyle={{ backgroundColor: "var(--g-800)", border: "1px solid var(--g-600)", borderRadius: "8px", color: "var(--g-100)" }} formatter={(value: number, name: string) => [`${value} mouvements`, name]} />
+                <Legend wrapperStyle={{ paddingTop: "10px", color: "var(--g-200)" }} />
               </PieChart>
             </ResponsiveContainer>
           )}
@@ -84,8 +134,8 @@ export default function DashboardPage() {
                 <Pie data={data.topConsommables} cx="50%" cy="45%" outerRadius={90} dataKey="value" nameKey="name">
                   {data.topConsommables.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: "#1c1917", border: "1px solid #44403c", borderRadius: "8px", color: "#e7e5e4" }} formatter={(value: number, name: string) => [`${value} mouvements`, name]} />
-                <Legend wrapperStyle={{ paddingTop: "10px" }} />
+                <Tooltip contentStyle={{ backgroundColor: "var(--g-800)", border: "1px solid var(--g-600)", borderRadius: "8px", color: "var(--g-100)" }} formatter={(value: number, name: string) => [`${value} mouvements`, name]} />
+                <Legend wrapperStyle={{ paddingTop: "10px", color: "var(--g-200)" }} />
               </PieChart>
             </ResponsiveContainer>
           )}
