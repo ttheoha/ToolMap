@@ -174,7 +174,7 @@ export default function GridPlan() {
     <div className="space-y-6">
       {/* Controls */}
       <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 items-end">
           <div>
             <label className="block text-sm text-garage-300 mb-1">Lieu</label>
             <select value={lieu} onChange={e => setLieu(e.target.value)} className="select-field w-full">
@@ -198,7 +198,7 @@ export default function GridPlan() {
             <label className="block text-sm text-garage-300 mb-1">Colonnes (1-N)</label>
             <input type="number" min={1} max={50} value={cols} onChange={e => setCols(Number(e.target.value))} className="input-field w-full" />
           </div>
-          <button onClick={handleGenerate} disabled={generating} className="btn-primary h-10">
+          <button onClick={handleGenerate} disabled={generating} className="btn-primary h-10 col-span-2 sm:col-span-1">
             {generating ? "..." : "Générer le plan"}
           </button>
         </div>
@@ -224,7 +224,7 @@ export default function GridPlan() {
       {/* Grid display */}
       {gridCells ? (
         <div className="card overflow-x-auto">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <h3 className="text-sm font-semibold text-garage-300">
               {lieu.replace("_", " ")} — {emplacement} ({gridCells.length} lignes × {gridCells[0]?.length || 0} colonnes)
             </h3>

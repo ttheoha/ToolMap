@@ -89,7 +89,7 @@ export default function ItemForm({ reference, onSave, onCancel, initial, presetL
         <label className="block text-sm text-garage-300 mb-1">Nom *</label>
         <input value={name} onChange={e => setName(e.target.value)} className="input-field w-full" required />
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm text-garage-300 mb-1">Catégorie *</label>
           <select value={categoryId} onChange={e => setCategoryId(Number(e.target.value))} className="select-field w-full" required>
@@ -107,7 +107,7 @@ export default function ItemForm({ reference, onSave, onCancel, initial, presetL
           </select>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm text-garage-300 mb-1">Quantité</label>
           <input type="number" min={0} value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="input-field w-full" />

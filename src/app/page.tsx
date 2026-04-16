@@ -39,7 +39,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-accent">Tableau de bord</h1>
+      <h1 className="text-xl md:text-2xl font-bold text-accent">Tableau de bord</h1>
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -50,7 +50,7 @@ export default function DashboardPage() {
           { label: "Consommables", value: data.stats.totalConsommables, color: "text-yellow-400" },
         ].map(s => (
           <div key={s.label} className="card text-center">
-            <p className={`text-3xl font-bold ${s.color}`}>{s.value}</p>
+            <p className={`text-2xl md:text-3xl font-bold ${s.color}`}>{s.value}</p>
             <p className="text-sm text-garage-400 mt-1">{s.label}</p>
           </div>
         ))}
