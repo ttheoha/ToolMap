@@ -64,9 +64,9 @@ export default function MovementLog({ reference }: { reference: string }) {
       ) : (
         list.map(m => (
           <div key={m.id} className="bg-garage-700/50 rounded px-3 py-2">
-            <div className="flex items-center gap-3 text-sm">
-              <span className="text-garage-500 text-xs shrink-0 w-32">{new Date(m.createdAt).toLocaleString("fr-FR")}</span>
-              <span className="font-medium text-garage-200 shrink-0 w-32 truncate">{m.item.name}</span>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm">
+              <span className="text-garage-500 text-xs shrink-0 w-full sm:w-32">{new Date(m.createdAt).toLocaleString("fr-FR")}</span>
+              <span className="font-medium text-garage-200 shrink-0 sm:w-32 truncate">{m.item.name}</span>
               <span className={`px-1.5 py-0.5 rounded text-xs font-medium shrink-0 ${
                 m.type === "Ajout" ? "bg-green-900 text-green-300" :
                 m.type === "Suppression" ? "bg-red-900 text-red-300" :
@@ -87,7 +87,7 @@ export default function MovementLog({ reference }: { reference: string }) {
               )}
             </div>
             {isHidden && restockId === m.item.id && m.type === "Vide" && m.item.status === "vide" && (
-              <div className="flex items-center gap-2 mt-2 ml-32 pl-3">
+              <div className="flex flex-wrap items-center gap-2 mt-2 sm:ml-32 pl-3">
                 <label className="text-xs text-garage-400">Quantité :</label>
                 <input
                   type="number"

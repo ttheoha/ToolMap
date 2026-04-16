@@ -89,12 +89,12 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
     <Modal isOpen={!!itemId} onClose={onClose} title={item.name} size="xl">
       <div className="space-y-6">
         {/* Header info */}
-        <div className="flex gap-6">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
           <div className="shrink-0">
             <ImageZoom src={item.photo || ""} alt={item.name} />
           </div>
           <div className="flex-1 space-y-2">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="px-2 py-0.5 rounded text-xs font-medium bg-accent/20 text-accent">{item.reference}</span>
               <span className="px-2 py-0.5 rounded text-xs font-medium bg-garage-600 text-garage-200">{item.category.name}</span>
               <span className={`px-2 py-0.5 rounded text-xs font-medium ${
@@ -104,7 +104,7 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
               }`}>{item.status}</span>
             </div>
             <p className="text-garage-300 text-sm">{item.description || "Aucune description"}</p>
-            <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
               <div><span className="text-garage-400">Quantité:</span> {item.quantity} {item.unit}</div>
               <div><span className="text-garage-400">Emplacement:</span> {item.location ? `${item.location.lieu} - ${item.location.emplacement}-${item.location.ligne}${item.location.colonne}` : "Non assigné"}</div>
             </div>
@@ -128,7 +128,7 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
         {loanForm && (
           <form onSubmit={handleLoan} className="card space-y-3">
             <h3 className="font-semibold text-sm text-accent">Nouveau prêt</h3>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input placeholder="Prénom" value={firstName} onChange={e => setFirstName(e.target.value)} className="input-field" required />
               <input placeholder="Nom" value={lastName} onChange={e => setLastName(e.target.value)} className="input-field" required />
             </div>
@@ -146,9 +146,9 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
             <h3 className="font-semibold text-sm text-accent mb-2">Prêts en cours</h3>
             <div className="space-y-2">
               {item.loans.filter(l => l.status === "en_cours").map(loan => (
-                <div key={loan.id} className="flex items-center justify-between bg-garage-700 rounded-lg px-3 py-2 text-sm">
+                <div key={loan.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-garage-700 rounded-lg px-3 py-2 text-sm">
                   <span>{loan.firstName} {loan.lastName} — retour prévu: {new Date(loan.expectedReturn).toLocaleDateString("fr-FR")}</span>
-                  <button onClick={() => handleReturnLoan(loan.id)} className="btn-primary text-xs py-1 px-2">Rendu</button>
+                  <button onClick={() => handleReturnLoan(loan.id)} className="btn-primary text-xs py-1 px-2 shrink-0">Rendu</button>
                 </div>
               ))}
             </div>
@@ -163,7 +163,7 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
               <p className="text-garage-500 text-sm">Aucun mouvement</p>
             ) : (
               item.history.map(h => (
-                <div key={h.id} className="flex items-center gap-3 text-sm bg-garage-700/50 rounded px-3 py-1.5">
+                <div key={h.id} className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm bg-garage-700/50 rounded px-3 py-1.5">
                   <span className="text-garage-500 text-xs shrink-0">{new Date(h.createdAt).toLocaleString("fr-FR")}</span>
                   <span className={`px-1.5 py-0.5 rounded text-xs font-medium shrink-0 ${
                     h.type === "Ajout" ? "bg-green-900 text-green-300" :

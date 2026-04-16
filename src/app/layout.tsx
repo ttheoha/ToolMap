@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="fr">
       <body className="flex min-h-screen">
         <Sidebar />
-        <main className="flex-1 ml-64 p-6 overflow-auto">{children}</main>
+        <main className="flex-1 ml-0 md:ml-64 p-4 md:p-6 pt-[4.5rem] md:pt-6 overflow-auto">{children}</main>
       </body>
     </html>
   );

@@ -59,9 +59,9 @@ export default function ItemListPage({ reference, title }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-accent">{title}</h1>
-        <button onClick={() => { setEditItem(null); setShowForm(true); }} className="btn-primary">
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl md:text-2xl font-bold text-accent">{title}</h1>
+        <button onClick={() => { setEditItem(null); setShowForm(true); }} className="btn-primary text-sm md:text-base shrink-0">
           + Ajouter
         </button>
       </div>
@@ -72,7 +72,7 @@ export default function ItemListPage({ reference, title }: Props) {
           placeholder="Rechercher (nom, catégorie, réf)..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="input-field flex-1 min-w-[250px]"
+          className="input-field flex-1 min-w-0"
         />
         <select value={filterCat} onChange={e => setFilterCat(e.target.value)} className="select-field">
           <option value="">Toutes catégories</option>
