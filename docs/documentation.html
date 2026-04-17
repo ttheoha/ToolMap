@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>ToolMap - Documentation Technique Complète</title>
+  <title>ToolMap - Documentation Technique Compl&egrave;te</title>
   <style>
     @page { margin: 20mm 15mm; size: A4; }
     * { box-sizing: border-box; }
@@ -77,14 +77,14 @@
 <!-- ============================================================ -->
 <div class="cover">
   <h1>ToolMap</h1>
-  <div class="subtitle">Application de gestion d'inventaire<br>pour garage automobile</div>
+  <div class="subtitle">Application de gestion d'inventaire<br>pour garage et atelier</div>
   <div class="meta">
     <strong>Documentation Technique Compl&egrave;te</strong><br>
     Version 1.0 &mdash; Avril 2026<br>
-    43 fichiers source &bull; 6 mod&egrave;les de donn&eacute;es &bull; 12 endpoints API
+    13 composants React &bull; 7 mod&egrave;les de donn&eacute;es &bull; 20 endpoints API
   </div>
   <div class="stack">
-    Docker Compose &bull; Next.js 15 (App Router) &bull; TypeScript &bull; MySQL 8 &bull; Prisma ORM &bull; Tailwind CSS &bull; Recharts
+    Docker Compose &bull; Next.js 15 (App Router) &bull; TypeScript 5 &bull; MySQL 8 &bull; Prisma 6 ORM &bull; Tailwind CSS 3.4 &bull; Recharts
   </div>
 </div>
 
@@ -106,18 +106,20 @@
     <li class="sub"><a href="#c3-1">3.1 Pr&eacute;requis</a></li>
     <li class="sub"><a href="#c3-2">3.2 Installation pas &agrave; pas</a></li>
     <li class="sub"><a href="#c3-3">3.3 Variables d'environnement</a></li>
+    <li class="sub"><a href="#c3-4">3.4 D&eacute;veloppement local (sans Docker)</a></li>
     <li><a href="#c4">4. Mod&egrave;le de donn&eacute;es</a></li>
     <li class="sub"><a href="#c4-1">4.1 Diagramme entit&eacute;-relation</a></li>
     <li class="sub"><a href="#c4-2">4.2 D&eacute;tail des tables</a></li>
     <li class="sub"><a href="#c4-3">4.3 Cat&eacute;gories par d&eacute;faut</a></li>
     <li><a href="#c5">5. API REST</a></li>
-    <li class="sub"><a href="#c5-1">5.1 Cat&eacute;gories</a></li>
-    <li class="sub"><a href="#c5-2">5.2 Items</a></li>
-    <li class="sub"><a href="#c5-3">5.3 Emplacements &amp; Grilles</a></li>
-    <li class="sub"><a href="#c5-4">5.4 Mouvements &amp; Export CSV</a></li>
-    <li class="sub"><a href="#c5-5">5.5 Pr&ecirc;ts</a></li>
-    <li class="sub"><a href="#c5-6">5.6 Dashboard</a></li>
-    <li class="sub"><a href="#c5-7">5.7 Sauvegarde &amp; Restauration</a></li>
+    <li class="sub"><a href="#c5-1">5.1 Items</a></li>
+    <li class="sub"><a href="#c5-2">5.2 Cat&eacute;gories</a></li>
+    <li class="sub"><a href="#c5-3">5.3 Lieux</a></li>
+    <li class="sub"><a href="#c5-4">5.4 Emplacements &amp; Grilles</a></li>
+    <li class="sub"><a href="#c5-5">5.5 Mouvements &amp; Export CSV</a></li>
+    <li class="sub"><a href="#c5-6">5.6 Pr&ecirc;ts</a></li>
+    <li class="sub"><a href="#c5-7">5.7 Dashboard</a></li>
+    <li class="sub"><a href="#c5-8">5.8 Sauvegarde &amp; Restauration</a></li>
     <li><a href="#c6">6. Pages de l'application</a></li>
     <li class="sub"><a href="#c6-1">6.1 Navigation (Sidebar)</a></li>
     <li class="sub"><a href="#c6-2">6.2 Accueil (Dashboard)</a></li>
@@ -127,16 +129,26 @@
     <li class="sub"><a href="#c7-1">7.1 G&eacute;n&eacute;ration de grille</a></li>
     <li class="sub"><a href="#c7-2">7.2 Indicateurs visuels</a></li>
     <li class="sub"><a href="#c7-3">7.3 Interaction avec un casier</a></li>
-    <li class="sub"><a href="#c7-4">7.4 Modification et suppression</a></li>
+    <li class="sub"><a href="#c7-4">7.4 Modification et suppression de grille</a></li>
     <li><a href="#c8">8. Syst&egrave;me d'historique</a></li>
     <li class="sub"><a href="#c8-1">8.1 G&eacute;n&eacute;ration automatique</a></li>
     <li class="sub"><a href="#c8-2">8.2 Consultation et filtrage</a></li>
     <li class="sub"><a href="#c8-3">8.3 Export CSV</a></li>
     <li><a href="#c9">9. Gestion des pr&ecirc;ts</a></li>
-    <li><a href="#c10">10. Sauvegarde et restauration</a></li>
-    <li><a href="#c11">11. Th&egrave;me et design</a></li>
-    <li><a href="#c12">12. Composants React</a></li>
-    <li><a href="#annexes">13. Annexes</a></li>
+    <li class="sub"><a href="#c9-1">9.1 Cr&eacute;ation d'un pr&ecirc;t</a></li>
+    <li class="sub"><a href="#c9-2">9.2 Retour d'un pr&ecirc;t</a></li>
+    <li class="sub"><a href="#c9-3">9.3 Alertes de retard</a></li>
+    <li><a href="#c10">10. Gestion des stocks (Consommables)</a></li>
+    <li class="sub"><a href="#c10-1">10.1 Stock minimum</a></li>
+    <li class="sub"><a href="#c10-2">10.2 Alertes de stock bas</a></li>
+    <li class="sub"><a href="#c10-3">10.3 R&eacute;approvisionnement</a></li>
+    <li><a href="#c11">11. Sauvegarde et restauration</a></li>
+    <li><a href="#c12">12. Th&egrave;me et design</a></li>
+    <li class="sub"><a href="#c12-1">12.1 Mode clair / sombre</a></li>
+    <li class="sub"><a href="#c12-2">12.2 Design responsive</a></li>
+    <li class="sub"><a href="#c12-3">12.3 Palette de couleurs</a></li>
+    <li><a href="#c13">13. Composants React</a></li>
+    <li><a href="#annexes">14. Annexes</a></li>
     <li class="sub"><a href="#a-a">A. Commandes utiles</a></li>
     <li class="sub"><a href="#a-b">B. Cycle de vie d'un Item</a></li>
     <li class="sub"><a href="#a-c">C. Flux de donn&eacute;es</a></li>
@@ -152,28 +164,33 @@
 <h1 id="c1">1. Pr&eacute;sentation g&eacute;n&eacute;rale</h1>
 
 <h2 id="c1-1">1.1 Objectif de l'application</h2>
-<p><strong>ToolMap</strong> est une application web compl&egrave;te de gestion d'inventaire con&ccedil;ue pour un garage automobile. Elle r&eacute;pond aux besoins suivants :</p>
+<p><strong>ToolMap</strong> est une application web compl&egrave;te de gestion d'inventaire con&ccedil;ue pour un garage ou atelier. Elle r&eacute;pond aux besoins suivants :</p>
 <ul>
   <li><strong>Inventaire complet</strong> : g&eacute;rer des <em>Outils</em>, <em>Mat&eacute;riels</em> et <em>Consommables</em> avec photos, cat&eacute;gories et descriptions</li>
-  <li><strong>Localisation physique</strong> : situer chaque objet via un syst&egrave;me de coordonn&eacute;es 4 niveaux (Lieu &rarr; Emplacement &rarr; Ligne &rarr; Colonne)</li>
+  <li><strong>Localisation physique</strong> : situer chaque objet via un syst&egrave;me de coordonn&eacute;es &agrave; 4 niveaux (Lieu &rarr; Emplacement &rarr; Ligne &rarr; Colonne)</li>
   <li><strong>Plan 2D interactif</strong> : visualiser l'organisation des casiers sur une grille CSS Grid</li>
   <li><strong>Tra&ccedil;abilit&eacute; totale</strong> : historique automatique de chaque mouvement (ajout, modification, suppression, pr&ecirc;t, retour, vente, &eacute;puisement)</li>
-  <li><strong>Gestion des pr&ecirc;ts</strong> : suivi des clients, dates pr&eacute;vues, retards</li>
-  <li><strong>Tableau de bord</strong> : statistiques et graphiques camembert (Top 10)</li>
+  <li><strong>Gestion des pr&ecirc;ts</strong> : suivi des emprunteurs, dates pr&eacute;vues, retards</li>
+  <li><strong>Gestion des stocks</strong> : seuil de stock minimum pour les consommables avec alertes visuelles</li>
+  <li><strong>Tableau de bord</strong> : statistiques, graphiques camembert (Top 5), alertes stocks bas et pr&ecirc;ts en retard</li>
   <li><strong>Export CSV</strong> : extraction des historiques au format tableur</li>
-  <li><strong>Sauvegarde / Restauration</strong> : backup et restore complet de la base de donn&eacute;es en JSON</li>
+  <li><strong>Sauvegarde / Restauration</strong> : backup et restore complet de la base de donn&eacute;es en JSON (jusqu'&agrave; 1 Go)</li>
+  <li><strong>Th&egrave;me clair / sombre</strong> : basculement instantan&eacute; avec persistance</li>
+  <li><strong>Design responsive</strong> : interface adapt&eacute;e mobile, tablette et bureau</li>
 </ul>
 
 <h2 id="c1-2">1.2 Stack technique</h2>
 <table>
   <tr><th>Composant</th><th>Technologie</th><th>Version</th><th>R&ocirc;le</th></tr>
   <tr><td>Conteneurisation</td><td>Docker / Docker Compose</td><td>20+</td><td>Orchestration des services</td></tr>
-  <tr><td>Frontend &amp; Backend</td><td>Next.js (App Router)</td><td>15.x</td><td>SSR, API Routes, rendu React</td></tr>
-  <tr><td>Langage</td><td>TypeScript</td><td>5.x</td><td>Typage statique</td></tr>
+  <tr><td>Frontend &amp; Backend</td><td>Next.js (App Router)</td><td>15.2</td><td>SSR, API Routes, rendu React</td></tr>
+  <tr><td>UI Framework</td><td>React</td><td>19.0</td><td>Composants interactifs</td></tr>
+  <tr><td>Langage</td><td>TypeScript</td><td>5.7</td><td>Typage statique</td></tr>
   <tr><td>Base de donn&eacute;es</td><td>MySQL</td><td>8.0</td><td>Stockage persistant</td></tr>
-  <tr><td>ORM</td><td>Prisma</td><td>6.x</td><td>Mod&eacute;lisation et requ&ecirc;tes type-safe</td></tr>
+  <tr><td>ORM</td><td>Prisma</td><td>6.4</td><td>Mod&eacute;lisation et requ&ecirc;tes type-safe</td></tr>
   <tr><td>CSS</td><td>Tailwind CSS</td><td>3.4</td><td>Styles utilitaires</td></tr>
-  <tr><td>Graphiques</td><td>Recharts</td><td>2.x</td><td>Camemberts sur le Dashboard</td></tr>
+  <tr><td>Graphiques</td><td>Recharts</td><td>2.15</td><td>Camemberts sur le Dashboard</td></tr>
+  <tr><td>Images</td><td>Sharp</td><td>0.33</td><td>Optimisation des images</td></tr>
   <tr><td>HTTPS</td><td>Node.js https natif</td><td>&mdash;</td><td>Serveur HTTPS sur port 443</td></tr>
 </table>
 
@@ -181,7 +198,7 @@
 <p>Chaque emplacement physique est identifi&eacute; par <strong>4 niveaux hi&eacute;rarchiques</strong> :</p>
 <table>
   <tr><th>Niveau</th><th>Format</th><th>Exemples</th><th>Description</th></tr>
-  <tr><td><strong>Lieu</strong></td><td>Texte pr&eacute;d&eacute;fini</td><td>Grange, Grange_etage, Garage, Cabane_jardin</td><td>B&acirc;timent ou zone</td></tr>
+  <tr><td><strong>Lieu</strong></td><td>Texte libre</td><td>Grange, Garage, Cabane_jardin</td><td>B&acirc;timent ou zone (g&eacute;rable dynamiquement)</td></tr>
   <tr><td><strong>Emplacement</strong></td><td>E + num&eacute;ro</td><td>E0, E1, E11, E999</td><td>Meuble / &eacute;tag&egrave;re dans le lieu</td></tr>
   <tr><td><strong>Ligne</strong></td><td>Lettre A-Z</td><td>A, B, C, ... Z</td><td>Rang&eacute;e verticale (max 26)</td></tr>
   <tr><td><strong>Colonne</strong></td><td>Chiffre 1-N</td><td>1, 2, 3, ... 50</td><td>Position horizontale</td></tr>
@@ -212,7 +229,7 @@
   </div>
 </div>
 
-<p>Le flux de donn&eacute;es suit un mod&egrave;le <strong>client &rarr; HTTPS &rarr; Next.js API &rarr; Prisma &rarr; MySQL</strong>. Le serveur HTTPS est un reverse proxy Node.js qui transmet les requ&ecirc;tes au serveur standalone Next.js (port 3000 interne).</p>
+<p>Le flux de donn&eacute;es suit un mod&egrave;le <strong>Client &rarr; HTTPS &rarr; Next.js API &rarr; Prisma &rarr; MySQL</strong>. Le serveur HTTPS est un reverse proxy Node.js qui transmet les requ&ecirc;tes au serveur standalone Next.js (port 3000 interne).</p>
 
 <h2 id="c2-2">2.2 Arborescence du projet</h2>
 <div class="file-tree">
@@ -222,43 +239,49 @@ toolmap/<br>
 &#9500;&#9472;&#9472; server.js&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Wrapper HTTPS reverse proxy<br>
 &#9500;&#9472;&#9472; generate-ssl.sh&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Script g&eacute;n&eacute;ration certificats<br>
 &#9500;&#9472;&#9472; package.json&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# D&eacute;pendances NPM<br>
+&#9500;&#9472;&#9472; next.config.ts&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Configuration Next.js (standalone + 1GB body)<br>
+&#9500;&#9472;&#9472; tailwind.config.ts&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Th&egrave;me personnalis&eacute; garage + accent<br>
 &#9500;&#9472;&#9472; .env&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Variables d'environnement<br>
 &#9500;&#9472;&#9472; prisma/<br>
-&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; schema.prisma&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Sch&eacute;ma BDD (6 mod&egrave;les)<br>
-&#9474;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; seed.ts&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 30 cat&eacute;gories par d&eacute;faut<br>
+&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; schema.prisma&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Sch&eacute;ma BDD (7 mod&egrave;les)<br>
+&#9474;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; seed.ts&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Cat&eacute;gories par d&eacute;faut<br>
 &#9500;&#9472;&#9472; ssl/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Certificats SSL (g&eacute;n&eacute;r&eacute;s)<br>
 &#9500;&#9472;&#9472; docs/<br>
 &#9474;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; documentation.html&nbsp;&nbsp;&nbsp;&nbsp;# Cette documentation<br>
 &#9492;&#9472;&#9472; src/<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; lib/<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; prisma.ts&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Singleton Prisma Client<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; components/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 9 composants React<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; Sidebar.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Navigation lat&eacute;rale<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; Modal.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Fen&ecirc;tre modale g&eacute;n&eacute;rique<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; ImageZoom.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Miniature cliquable + zoom<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; ItemForm.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Formulaire CRUD item<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; ItemListPage.tsx&nbsp;&nbsp;&nbsp;&nbsp;# Liste filtr&eacute;e + recherche<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; ItemDetailModal.tsx&nbsp;&nbsp;# Fiche d&eacute;tail compl&egrave;te<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; MovementLog.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Historique + export CSV<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; components/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 13 composants React<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; Sidebar.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Navigation lat&eacute;rale responsive<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; Modal.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Fen&ecirc;tre modale g&eacute;n&eacute;rique (sm/md/lg/xl)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; ImageZoom.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Miniature cliquable + zoom plein &eacute;cran<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; ItemForm.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Formulaire cr&eacute;ation/&eacute;dition item<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; ItemListPage.tsx&nbsp;&nbsp;&nbsp;&nbsp;# Liste filtr&eacute;e + recherche + grille<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; ItemDetailModal.tsx&nbsp;&nbsp;# Fiche d&eacute;tail avec pr&ecirc;ts et historique<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; MovementLog.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Historique + masqu&eacute;s + export CSV<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; CategoriesManager.tsx # CRUD cat&eacute;gories<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; LocationsManager.tsx&nbsp;# CRUD lieux dynamiques<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; GridPlan.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Plan 2D interactif<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; BackupRestore.tsx&nbsp;&nbsp;&nbsp;# Sauvegarde/restauration BDD<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; BackupRestore.tsx&nbsp;&nbsp;&nbsp;# Sauvegarde/restauration BDD<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; ThemeProvider.tsx&nbsp;&nbsp;&nbsp;# Contexte clair/sombre<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; ThemeToggle.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Bouton bascule th&egrave;me<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; app/<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; layout.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Layout principal + sidebar<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; globals.css&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Styles Tailwind personnalis&eacute;s<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; layout.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Layout principal + sidebar + ThemeProvider<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; globals.css&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Variables CSS th&egrave;me + utilitaires<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; page.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Dashboard (Accueil)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; outils/page.tsx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Page Outils<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; materiels/page.tsx&nbsp;&nbsp;# Page Mat&eacute;riels<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; consommables/page.tsx # Page Consommables<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; parametrage/page.tsx&nbsp;# Page Param&eacute;trage (3 onglets)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; api/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 12 endpoints API REST<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; categories/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET, POST, PUT, DELETE<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; items/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET, POST, PUT, DELETE<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; locations/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET, POST<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; grid/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET, POST, PUT, DELETE<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; movements/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET + export CSV<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; loans/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET, POST, PUT<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; dashboard/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET (stats + charts)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; parametrage/page.tsx&nbsp;# Page Param&eacute;trage (4 onglets)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; api/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 20 endpoints API REST<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; categories/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET, POST + [id] PUT, DELETE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; items/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET, POST + [id] GET, PUT, DELETE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; lieux/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET, POST + [id] PUT, DELETE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; locations/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET, POST + [id] PUT, DELETE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; grid/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET, POST + [id] PUT, DELETE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; movements/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET + export/ GET (CSV)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; loans/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET, POST + [id] PUT<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9500;&#9472;&#9472; dashboard/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET (stats + graphiques)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#9492;&#9472;&#9472; backup/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# GET (export) + POST (import)<br>
 </div>
 
@@ -267,13 +290,17 @@ toolmap/<br>
 <table>
   <tr><th>Service</th><th>Image</th><th>Port expos&eacute;</th><th>Volume</th><th>D&eacute;pendance</th></tr>
   <tr><td><code>db</code></td><td>mysql:8.0</td><td>3306</td><td><code>mysql_data</code> (persistant)</td><td>&mdash;</td></tr>
-  <tr><td><code>web</code></td><td>Build local (Dockerfile)</td><td><strong>443 (HTTPS)</strong></td><td><code>./ssl</code> (read-only)</td><td>db (healthcheck)</td></tr>
+  <tr><td><code>web</code></td><td>Build local (Dockerfile)</td><td><strong>444 &rarr; 443 (HTTPS)</strong></td><td><code>./ssl</code> (read-only)</td><td>db (healthcheck)</td></tr>
 </table>
+
+<div class="info">
+  <strong>MySQL config :</strong> Le param&egrave;tre <code>max_allowed_packet=64M</code> est configur&eacute; pour supporter les photos encod&eacute;es en base64 et les sauvegardes volumineuses.
+</div>
 
 <h3>Dockerfile &mdash; Build multi-stage</h3>
 <table>
   <tr><th>Stage</th><th>Base</th><th>Actions</th></tr>
-  <tr><td><code>base</code></td><td>node:20-alpine</td><td>Install d&eacute;pendances, copie schema Prisma, <code>npm install</code>, <code>prisma generate</code>, <code>next build</code></td></tr>
+  <tr><td><code>base</code></td><td>node:20-alpine</td><td>Install d&eacute;pendances, copie schema Prisma, <code>npm install</code>, <code>prisma generate</code>, <code>next build</code> (output: standalone)</td></tr>
   <tr><td><code>runner</code></td><td>node:20-alpine</td><td>Copie du build standalone, renommage <code>server.js</code> &rarr; <code>server.standalone.js</code>, ajout du wrapper HTTPS</td></tr>
 </table>
 
@@ -283,6 +310,7 @@ toolmap/<br>
   <li><strong>Next.js standalone</strong> (<code>server.standalone.js</code>) : &eacute;coute en HTTP sur le port 3000 (interne)</li>
   <li><strong>Reverse proxy HTTPS</strong> (<code>server.js</code>) : &eacute;coute sur le port 443 avec les certificats SSL, redirige vers le port 3000</li>
 </ol>
+<p>En cas d'erreur de proxy, le serveur retourne une <strong>502 Bad Gateway</strong>.</p>
 
 <!-- ============================================================ -->
 <!-- CHAPITRE 3 -->
@@ -300,31 +328,32 @@ toolmap/<br>
 <h2 id="c3-2">3.2 Installation pas &agrave; pas</h2>
 
 <div class="flow-step"><div class="flow-num">1</div><div class="flow-text">
-  <strong>G&eacute;n&eacute;rer les certificats SSL</strong>
-  <pre><code>cd toolmap
-chmod +x generate-ssl.sh
-./generate-ssl.sh</code></pre>
-  <p>Cr&eacute;e <code>ssl/key.pem</code> et <code>ssl/cert.pem</code> (certificat auto-sign&eacute;, valide 365 jours).</p>
+  <strong>Cloner le projet</strong>
+  <pre><code>git clone &lt;url-du-repo&gt;
+cd toolmap</code></pre>
 </div></div>
 
 <div class="flow-step"><div class="flow-num">2</div><div class="flow-text">
-  <strong>Construire et lancer les conteneurs</strong>
-  <pre><code>docker compose up -d --build</code></pre>
-  <p>Premi&egrave;re ex&eacute;cution : ~2 minutes (t&eacute;l&eacute;chargement images + build).</p>
+  <strong>G&eacute;n&eacute;rer les certificats SSL</strong>
+  <pre><code>chmod +x generate-ssl.sh
+./generate-ssl.sh</code></pre>
+  <p>Cr&eacute;e <code>ssl/key.pem</code> et <code>ssl/cert.pem</code> (certificat auto-sign&eacute;, RSA 2048 bits, valide 365 jours, CN=localhost).</p>
 </div></div>
 
 <div class="flow-step"><div class="flow-num">3</div><div class="flow-text">
-  <strong>Initialiser la base de donn&eacute;es</strong>
-  <pre><code># Appliquer le sch&eacute;ma
-docker exec toolmap-web ./node_modules/.bin/prisma db push
-
-# Ins&eacute;rer les cat&eacute;gories par d&eacute;faut
-docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts</code></pre>
+  <strong>Construire et lancer les conteneurs</strong>
+  <pre><code>docker compose up -d --build</code></pre>
+  <p>Premi&egrave;re ex&eacute;cution : ~2 minutes (t&eacute;l&eacute;chargement images + build). Le Dockerfile ex&eacute;cute automatiquement <code>prisma db push</code> au d&eacute;marrage.</p>
 </div></div>
 
 <div class="flow-step"><div class="flow-num">4</div><div class="flow-text">
+  <strong>Ins&eacute;rer les cat&eacute;gories par d&eacute;faut (optionnel)</strong>
+  <pre><code>docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts</code></pre>
+</div></div>
+
+<div class="flow-step"><div class="flow-num">5</div><div class="flow-text">
   <strong>Acc&eacute;der &agrave; l'application</strong>
-  <pre><code>https://localhost</code></pre>
+  <pre><code>https://localhost:444</code></pre>
 </div></div>
 
 <div class="note">
@@ -333,17 +362,36 @@ docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts</code></pre>
 
 <h2 id="c3-3">3.3 Variables d'environnement</h2>
 <table>
-  <tr><th>Variable</th><th>Service</th><th>Valeur par d&eacute;faut</th></tr>
-  <tr><td><code>DATABASE_URL</code></td><td>web</td><td><code>mysql://toolmap:toolmap_pass_2024@db:3306/toolmap</code></td></tr>
-  <tr><td><code>MYSQL_ROOT_PASSWORD</code></td><td>db</td><td><code>toolmap_root_2024</code></td></tr>
-  <tr><td><code>MYSQL_DATABASE</code></td><td>db</td><td><code>toolmap</code></td></tr>
-  <tr><td><code>MYSQL_USER</code></td><td>db</td><td><code>toolmap</code></td></tr>
-  <tr><td><code>MYSQL_PASSWORD</code></td><td>db</td><td><code>toolmap_pass_2024</code></td></tr>
+  <tr><th>Variable</th><th>Service</th><th>Valeur par d&eacute;faut</th><th>Description</th></tr>
+  <tr><td><code>DATABASE_URL</code></td><td>web</td><td><code>mysql://toolmap:toolmap_pass_2024@db:3306/toolmap</code></td><td>Connexion MySQL pour Prisma</td></tr>
+  <tr><td><code>MYSQL_ROOT_PASSWORD</code></td><td>db</td><td><code>toolmap_root_2024</code></td><td>Mot de passe root MySQL</td></tr>
+  <tr><td><code>MYSQL_DATABASE</code></td><td>db</td><td><code>toolmap</code></td><td>Nom de la base</td></tr>
+  <tr><td><code>MYSQL_USER</code></td><td>db</td><td><code>toolmap</code></td><td>Utilisateur applicatif</td></tr>
+  <tr><td><code>MYSQL_PASSWORD</code></td><td>db</td><td><code>toolmap_pass_2024</code></td><td>Mot de passe applicatif</td></tr>
+  <tr><td><code>NEXT_PUBLIC_BASE_URL</code></td><td>web</td><td><code>https://localhost</code></td><td>URL de base publique</td></tr>
+  <tr><td><code>NODE_TLS_REJECT_UNAUTHORIZED</code></td><td>web</td><td><code>0</code></td><td>Accepter certificats auto-sign&eacute;s</td></tr>
 </table>
 
 <div class="warning">
   <strong>S&eacute;curit&eacute; production :</strong> Modifiez imp&eacute;rativement tous les mots de passe par d&eacute;faut et utilisez un vrai certificat SSL (Let's Encrypt).
 </div>
+
+<h2 id="c3-4">3.4 D&eacute;veloppement local (sans Docker)</h2>
+<pre><code># Installer les d&eacute;pendances
+npm install
+
+# Configurer la base de donn&eacute;es (MySQL local requis)
+# &Eacute;diter .env avec votre DATABASE_URL
+
+# Synchroniser le sch&eacute;ma
+npm run db:push
+
+# Ins&eacute;rer les donn&eacute;es initiales
+npm run db:seed
+
+# Lancer le serveur de d&eacute;veloppement
+npm run dev</code></pre>
+<p>L'application est alors accessible sur <code>http://localhost:3000</code>.</p>
 
 <!-- ============================================================ -->
 <!-- CHAPITRE 4 -->
@@ -352,15 +400,23 @@ docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts</code></pre>
 
 <h2 id="c4-1">4.1 Diagramme entit&eacute;-relation</h2>
 <pre><code>
- ┌──────────────┐       ┌──────────────┐       ┌──────────────┐
- │   Category   │       │   Location   │       │  GridConfig  │
- │──────────────│       │──────────────│       │──────────────│
- │ id       (PK)│       │ id       (PK)│       │ id       (PK)│
- │ name  UNIQUE │       │ lieu         │       │ lieu         │
- │ reference    │       │ emplacement  │       │ emplacement  │
- │ createdAt    │       │ ligne        │       │ rows         │
- └──────┬───────┘       │ colonne      │       │ cols         │
-        │ 1:N           └──────┬───────┘       └──────────────┘
+ ┌──────────────┐                              ┌──────────────┐
+ │     Lieu     │                              │  GridConfig  │
+ │──────────────│                              │──────────────│
+ │ id       (PK)│                              │ id       (PK)│
+ │ name  UNIQUE │                              │ lieu         │
+ │ createdAt    │                              │ emplacement  │
+ └──────────────┘                              │ rows         │
+                                               │ cols         │
+ ┌──────────────┐       ┌──────────────┐       └──────────────┘
+ │   Category   │       │   Location   │
+ │──────────────│       │──────────────│
+ │ id       (PK)│       │ id       (PK)│
+ │ name  UNIQUE │       │ lieu         │
+ │ reference    │       │ emplacement  │
+ │ createdAt    │       │ ligne        │
+ └──────┬───────┘       │ colonne      │
+        │ 1:N           └──────┬───────┘
         │                      │ 1:N
         ▼                      ▼
  ┌─────────────────────────────────────────┐
@@ -369,9 +425,9 @@ docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts</code></pre>
  │ id (PK)          │ name                │
  │ reference        │ photo (LongText)    │
  │ description      │ quantity            │
- │ unit             │ status              │
- │ categoryId (FK) ─┘                     │
- │ locationId (FK) ───────────────────────┘
+ │ minStock         │ unit                │
+ │ status           │ categoryId (FK) ────┘
+ │ locationId (FK) ────────────────────────┘
  │ createdAt        │ updatedAt           │
  └────────┬─────────────────┬─────────────┘
           │ 1:N             │ 1:N
@@ -397,23 +453,56 @@ docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts</code></pre>
   <tr><th>Champ</th><th>Type MySQL</th><th>Contraintes</th><th>Description</th></tr>
   <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>PRIMARY KEY</td><td>Identifiant unique</td></tr>
   <tr><td>name</td><td>VARCHAR(100)</td><td>UNIQUE</td><td>Nom de la cat&eacute;gorie</td></tr>
-  <tr><td>reference</td><td>VARCHAR(50)</td><td>INDEX</td><td>Outils, Materiels, ou Consommables</td></tr>
+  <tr><td>reference</td><td>VARCHAR(50)</td><td>INDEX</td><td>Type : Outils, Materiels ou Consommables</td></tr>
   <tr><td>createdAt</td><td>DATETIME</td><td>DEFAULT NOW()</td><td>Date de cr&eacute;ation</td></tr>
 </table>
+
+<h3>Table Lieu</h3>
+<table>
+  <tr><th>Champ</th><th>Type MySQL</th><th>Contraintes</th><th>Description</th></tr>
+  <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>PRIMARY KEY</td><td>Identifiant unique</td></tr>
+  <tr><td>name</td><td>VARCHAR(50)</td><td>UNIQUE</td><td>Nom du lieu (Garage, Grange, etc.)</td></tr>
+  <tr><td>createdAt</td><td>DATETIME</td><td>DEFAULT NOW()</td><td>Date de cr&eacute;ation</td></tr>
+</table>
+
+<h3>Table Location</h3>
+<table>
+  <tr><th>Champ</th><th>Type MySQL</th><th>Contraintes</th><th>Description</th></tr>
+  <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>PRIMARY KEY</td><td>Identifiant unique</td></tr>
+  <tr><td>lieu</td><td>VARCHAR(50)</td><td>INDEX</td><td>R&eacute;f&eacute;rence au lieu</td></tr>
+  <tr><td>emplacement</td><td>VARCHAR(10)</td><td>&mdash;</td><td>Code meuble (E0, E1...)</td></tr>
+  <tr><td>ligne</td><td>VARCHAR(2)</td><td>&mdash;</td><td>Rang&eacute;e (A, B, C...)</td></tr>
+  <tr><td>colonne</td><td>INT</td><td>&mdash;</td><td>Position horizontale (1, 2, 3...)</td></tr>
+  <tr><td>createdAt</td><td>DATETIME</td><td>DEFAULT NOW()</td><td>Date de cr&eacute;ation</td></tr>
+</table>
+<div class="info"><strong>Contrainte unique :</strong> <code>@@unique([lieu, emplacement, ligne, colonne])</code> &mdash; chaque case est unique.</div>
+
+<h3>Table GridConfig</h3>
+<table>
+  <tr><th>Champ</th><th>Type MySQL</th><th>Contraintes</th><th>Description</th></tr>
+  <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>PRIMARY KEY</td><td>Identifiant unique</td></tr>
+  <tr><td>lieu</td><td>VARCHAR(50)</td><td>&mdash;</td><td>Lieu associ&eacute;</td></tr>
+  <tr><td>emplacement</td><td>VARCHAR(10)</td><td>&mdash;</td><td>Emplacement associ&eacute;</td></tr>
+  <tr><td>rows</td><td>INT</td><td>&mdash;</td><td>Nombre de lignes (1-26, correspondant &agrave; A-Z)</td></tr>
+  <tr><td>cols</td><td>INT</td><td>&mdash;</td><td>Nombre de colonnes</td></tr>
+  <tr><td>createdAt</td><td>DATETIME</td><td>DEFAULT NOW()</td><td>Date de cr&eacute;ation</td></tr>
+</table>
+<div class="info"><strong>Contrainte unique :</strong> <code>@@unique([lieu, emplacement])</code> &mdash; une seule configuration de grille par emplacement.</div>
 
 <h3>Table Item</h3>
 <table>
   <tr><th>Champ</th><th>Type MySQL</th><th>Contraintes</th><th>Description</th></tr>
   <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>PRIMARY KEY</td><td>Identifiant unique</td></tr>
-  <tr><td>name</td><td>VARCHAR(200)</td><td>NOT NULL</td><td>Nom de l'objet</td></tr>
-  <tr><td>reference</td><td>VARCHAR(50)</td><td>INDEX</td><td>Type : Outils / Materiels / Consommables</td></tr>
-  <tr><td>photo</td><td>LONGTEXT</td><td>NULLABLE</td><td>Image encod&eacute;e en Base64 (data URI)</td></tr>
+  <tr><td>name</td><td>VARCHAR(200)</td><td>NOT NULL</td><td>Nom de l'item</td></tr>
+  <tr><td>reference</td><td>VARCHAR(50)</td><td>INDEX</td><td>Type : Outils, Materiels ou Consommables</td></tr>
+  <tr><td>photo</td><td>LONGTEXT</td><td>NULLABLE</td><td>Photo encod&eacute;e en Base64</td></tr>
   <tr><td>description</td><td>TEXT</td><td>NULLABLE</td><td>Description libre</td></tr>
   <tr><td>quantity</td><td>INT</td><td>DEFAULT 1</td><td>Quantit&eacute; en stock</td></tr>
-  <tr><td>unit</td><td>VARCHAR(20)</td><td>DEFAULT 'unitaire'</td><td>unitaire, litre, metre</td></tr>
+  <tr><td>minStock</td><td>INT</td><td>NULLABLE</td><td>Seuil de stock minimum (consommables)</td></tr>
+  <tr><td>unit</td><td>VARCHAR(20)</td><td>DEFAULT "unitaire"</td><td>Unit&eacute; : unitaire, litre ou metre</td></tr>
   <tr><td>categoryId</td><td>INT</td><td>FK &rarr; Category, INDEX</td><td>Cat&eacute;gorie de l'item</td></tr>
-  <tr><td>locationId</td><td>INT</td><td>FK &rarr; Location, NULLABLE, INDEX</td><td>Emplacement physique (null = non assign&eacute;)</td></tr>
-  <tr><td>status</td><td>VARCHAR(20)</td><td>DEFAULT 'actif', INDEX</td><td>actif, vendu, vide</td></tr>
+  <tr><td>locationId</td><td>INT</td><td>FK &rarr; Location, NULLABLE, INDEX</td><td>Emplacement physique</td></tr>
+  <tr><td>status</td><td>VARCHAR(20)</td><td>DEFAULT "actif", INDEX</td><td>Statut : actif, vendu ou vide</td></tr>
   <tr><td>createdAt</td><td>DATETIME</td><td>DEFAULT NOW()</td><td>Date de cr&eacute;ation</td></tr>
   <tr><td>updatedAt</td><td>DATETIME</td><td>AUTO UPDATE</td><td>Derni&egrave;re modification</td></tr>
 </table>
@@ -423,9 +512,22 @@ docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts</code></pre>
   <tr><th>Champ</th><th>Type MySQL</th><th>Contraintes</th><th>Description</th></tr>
   <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>PRIMARY KEY</td><td>Identifiant unique</td></tr>
   <tr><td>itemId</td><td>INT</td><td>FK &rarr; Item (CASCADE), INDEX</td><td>Item concern&eacute;</td></tr>
-  <tr><td>type</td><td>VARCHAR(30)</td><td>INDEX</td><td>Ajout, Modif, Suppression, Pret, Rendu, Vendu, Vide</td></tr>
-  <tr><td>description</td><td>TEXT</td><td>NULLABLE</td><td>D&eacute;tail du mouvement</td></tr>
+  <tr><td>type</td><td>VARCHAR(30)</td><td>INDEX</td><td>Type de mouvement (voir ci-dessous)</td></tr>
+  <tr><td>description</td><td>TEXT</td><td>NULLABLE</td><td>D&eacute;tails du changement</td></tr>
   <tr><td>createdAt</td><td>DATETIME</td><td>DEFAULT NOW(), INDEX</td><td>Date du mouvement</td></tr>
+</table>
+
+<h4>Types de mouvements</h4>
+<table>
+  <tr><th>Type</th><th>D&eacute;clencheur</th><th>Description g&eacute;n&eacute;r&eacute;e</th></tr>
+  <tr><td><code>Ajout</code></td><td>Cr&eacute;ation d'un item</td><td>Article ajout&eacute; &agrave; l'inventaire</td></tr>
+  <tr><td><code>Modif</code></td><td>Modification d'un item</td><td>D&eacute;tail des champs modifi&eacute;s (nom, quantit&eacute;, cat&eacute;gorie, emplacement, photo, stock min.)</td></tr>
+  <tr><td><code>Suppression</code></td><td>Suppression d'un item</td><td>Article supprim&eacute; de l'inventaire</td></tr>
+  <tr><td><code>Pret</code></td><td>Cr&eacute;ation d'un pr&ecirc;t</td><td>Pr&ecirc;t&eacute; &agrave; {Pr&eacute;nom Nom} &mdash; Retour pr&eacute;vu : {date}</td></tr>
+  <tr><td><code>Rendu</code></td><td>Retour d'un pr&ecirc;t</td><td>Rendu par {Pr&eacute;nom Nom}</td></tr>
+  <tr><td><code>Vendu</code></td><td>Marquage comme vendu</td><td>Article marqu&eacute; comme vendu</td></tr>
+  <tr><td><code>Vide</code></td><td>Marquage comme &eacute;puis&eacute;</td><td>Article marqu&eacute; comme &eacute;puis&eacute;</td></tr>
+  <tr><td><code>Reappro</code></td><td>R&eacute;approvisionnement</td><td>R&eacute;approvisionn&eacute; &agrave; {quantit&eacute;} unit&eacute;(s)</td></tr>
 </table>
 
 <h3>Table Loan</h3>
@@ -433,143 +535,204 @@ docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts</code></pre>
   <tr><th>Champ</th><th>Type MySQL</th><th>Contraintes</th><th>Description</th></tr>
   <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>PRIMARY KEY</td><td>Identifiant unique</td></tr>
   <tr><td>itemId</td><td>INT</td><td>FK &rarr; Item (CASCADE), INDEX</td><td>Item pr&ecirc;t&eacute;</td></tr>
-  <tr><td>firstName</td><td>VARCHAR(100)</td><td>NOT NULL</td><td>Pr&eacute;nom du client</td></tr>
-  <tr><td>lastName</td><td>VARCHAR(100)</td><td>NOT NULL</td><td>Nom du client</td></tr>
+  <tr><td>firstName</td><td>VARCHAR(100)</td><td>NOT NULL</td><td>Pr&eacute;nom de l'emprunteur</td></tr>
+  <tr><td>lastName</td><td>VARCHAR(100)</td><td>NOT NULL</td><td>Nom de l'emprunteur</td></tr>
   <tr><td>loanDate</td><td>DATETIME</td><td>DEFAULT NOW()</td><td>Date du pr&ecirc;t</td></tr>
   <tr><td>expectedReturn</td><td>DATETIME</td><td>NOT NULL</td><td>Date de retour pr&eacute;vue</td></tr>
   <tr><td>actualReturn</td><td>DATETIME</td><td>NULLABLE</td><td>Date de retour effectif</td></tr>
-  <tr><td>status</td><td>VARCHAR(20)</td><td>DEFAULT 'en_cours', INDEX</td><td>en_cours, rendu</td></tr>
+  <tr><td>status</td><td>VARCHAR(20)</td><td>DEFAULT "en_cours", INDEX</td><td>Statut : en_cours ou rendu</td></tr>
+  <tr><td>createdAt</td><td>DATETIME</td><td>DEFAULT NOW()</td><td>Date de cr&eacute;ation</td></tr>
 </table>
 
-<h3>Table Location</h3>
+<h2 id="c4-3">4.3 Cat&eacute;gories par d&eacute;faut</h2>
+<p>Le script <code>prisma/seed.ts</code> ins&egrave;re les cat&eacute;gories initiales :</p>
 <table>
-  <tr><th>Champ</th><th>Type MySQL</th><th>Contraintes</th><th>Description</th></tr>
-  <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>PRIMARY KEY</td><td>Identifiant unique</td></tr>
-  <tr><td>lieu</td><td>VARCHAR(50)</td><td>INDEX</td><td>Grange, Grange_etage, Garage, Cabane_jardin</td></tr>
-  <tr><td>emplacement</td><td>VARCHAR(10)</td><td>&mdash;</td><td>E0 &agrave; E999</td></tr>
-  <tr><td>ligne</td><td>VARCHAR(2)</td><td>&mdash;</td><td>A &agrave; Z</td></tr>
-  <tr><td>colonne</td><td>INT</td><td>&mdash;</td><td>1 &agrave; N</td></tr>
-</table>
-<p>Contrainte unique : <code>(lieu, emplacement, ligne, colonne)</code></p>
-
-<h3>Table GridConfig</h3>
-<table>
-  <tr><th>Champ</th><th>Type MySQL</th><th>Contraintes</th><th>Description</th></tr>
-  <tr><td>id</td><td>INT AUTO_INCREMENT</td><td>PRIMARY KEY</td><td>Identifiant unique</td></tr>
-  <tr><td>lieu</td><td>VARCHAR(50)</td><td>&mdash;</td><td>Lieu du plan</td></tr>
-  <tr><td>emplacement</td><td>VARCHAR(10)</td><td>&mdash;</td><td>Identifiant emplacement</td></tr>
-  <tr><td>rows</td><td>INT</td><td>&mdash;</td><td>Nombre de lignes g&eacute;n&eacute;r&eacute;es</td></tr>
-  <tr><td>cols</td><td>INT</td><td>&mdash;</td><td>Nombre de colonnes g&eacute;n&eacute;r&eacute;es</td></tr>
-</table>
-<p>Contrainte unique : <code>(lieu, emplacement)</code></p>
-
-<h2 id="c4-3">4.3 Cat&eacute;gories par d&eacute;faut (seed)</h2>
-<table>
-  <tr><th>Outils (10)</th><th>Mat&eacute;riels (10)</th><th>Consommables (10)</th></tr>
-  <tr><td>Cl&eacute;s</td><td>Levage</td><td>Huiles</td></tr>
-  <tr><td>Tournevis</td><td>Soudure</td><td>Filtres</td></tr>
-  <tr><td>Pinces</td><td>Diagnostic</td><td>Visserie</td></tr>
-  <tr><td>Marteaux</td><td>Pneumatique</td><td>Joints</td></tr>
-  <tr><td>Scies</td><td>&Eacute;clairage</td><td>Adh&eacute;sifs</td></tr>
-  <tr><td>Mesure</td><td>Nettoyage</td><td>Abrasifs</td></tr>
-  <tr><td>Douilles</td><td>Rangement</td><td>Lubrifiants</td></tr>
-  <tr><td>Limes</td><td>Protection</td><td>Peinture</td></tr>
-  <tr><td>Extracteurs</td><td>&Eacute;lectrique</td><td>&Eacute;lectricit&eacute;</td></tr>
-  <tr><td>&Eacute;lectroportatif</td><td>Hydraulique</td><td>Nettoyants</td></tr>
+  <tr><th>R&eacute;f&eacute;rence</th><th>Cat&eacute;gories</th></tr>
+  <tr><td><strong>Outils</strong></td><td>Cl&eacute;s, Tournevis, Pinces, Marteaux, Scies, Mesure, Serrage, Coupe, &Eacute;lectroportatif, Jardinage</td></tr>
+  <tr><td><strong>Mat&eacute;riels</strong></td><td>&Eacute;chelles, Rangement, &Eacute;clairage, Nettoyage, S&eacute;curit&eacute;, &Eacute;lectrique, Plomberie, Soudure, Levage, Compresseurs</td></tr>
+  <tr><td><strong>Consommables</strong></td><td>Visserie, Clous, Colles, Lubrifiants, Peintures, Abrasifs, Rubans, Joints, Filtres, Piles</td></tr>
 </table>
 
 <!-- ============================================================ -->
 <!-- CHAPITRE 5 -->
 <!-- ============================================================ -->
 <h1 id="c5">5. API REST</h1>
-<p>Toutes les routes sont sous <code>/api/</code>. Le format d'&eacute;change est <strong>JSON</strong> sauf pour l'export CSV.</p>
 
-<h2 id="c5-1">5.1 Cat&eacute;gories <code>/api/categories</code></h2>
+<p>Toutes les routes API se trouvent sous <code>/api/</code>. Les r&eacute;ponses sont au format JSON. Les erreurs retournent un objet <code>{ "error": "message" }</code> avec le code HTTP correspondant.</p>
+
+<h2 id="c5-1">5.1 Items</h2>
+
+<h3>GET /api/items</h3>
+<p>Liste les items avec filtrage.</p>
 <table>
-  <tr><th>M&eacute;thode</th><th>Route</th><th>Param&egrave;tres</th><th>Description</th></tr>
-  <tr><td>GET</td><td><code>/api/categories</code></td><td><code>?reference=Outils</code></td><td>Lister (avec compteur items)</td></tr>
-  <tr><td>POST</td><td><code>/api/categories</code></td><td>Body: <code>{name, reference}</code></td><td>Cr&eacute;er une cat&eacute;gorie</td></tr>
-  <tr><td>PUT</td><td><code>/api/categories/:id</code></td><td>Body: <code>{name, reference}</code></td><td>Modifier</td></tr>
-  <tr><td>DELETE</td><td><code>/api/categories/:id</code></td><td>&mdash;</td><td>Supprimer</td></tr>
+  <tr><th>Param&egrave;tre</th><th>Type</th><th>Obligatoire</th><th>Description</th></tr>
+  <tr><td><code>reference</code></td><td>string</td><td>Non</td><td>Filtre par type (Outils, Materiels, Consommables)</td></tr>
+  <tr><td><code>categoryId</code></td><td>number</td><td>Non</td><td>Filtre par cat&eacute;gorie</td></tr>
+  <tr><td><code>search</code></td><td>string</td><td>Non</td><td>Recherche dans le nom</td></tr>
+  <tr><td><code>status</code></td><td>string</td><td>Non</td><td>Filtre par statut (d&eacute;faut : "actif")</td></tr>
+  <tr><td><code>locationId</code></td><td>number</td><td>Non</td><td>Filtre par emplacement</td></tr>
 </table>
+<p><strong>R&eacute;ponse :</strong> Tableau d'items avec <code>category</code>, <code>location</code> et nombre de pr&ecirc;ts actifs (<code>_count.loans</code>). Tri&eacute; par nom de cat&eacute;gorie puis nom d'item.</p>
 
-<h2 id="c5-2">5.2 Items <code>/api/items</code></h2>
-<table>
-  <tr><th>M&eacute;thode</th><th>Route</th><th>Param&egrave;tres</th><th>Description</th></tr>
-  <tr><td>GET</td><td><code>/api/items</code></td><td><code>?reference=&amp;categoryId=&amp;search=&amp;status=&amp;locationId=</code></td><td>Lister (d&eacute;dupliqu&eacute; par ID)</td></tr>
-  <tr><td>POST</td><td><code>/api/items</code></td><td>Body complet</td><td>Cr&eacute;er + mouvement &laquo; Ajout &raquo; auto</td></tr>
-  <tr><td>GET</td><td><code>/api/items/:id</code></td><td>&mdash;</td><td>D&eacute;tail avec historique et pr&ecirc;ts</td></tr>
-  <tr><td>PUT</td><td><code>/api/items/:id</code></td><td>Body partiel</td><td>Modifier + mouvement &laquo; Modif &raquo; auto</td></tr>
-  <tr><td>DELETE</td><td><code>/api/items/:id</code></td><td>&mdash;</td><td>Supprimer + mouvement &laquo; Suppression &raquo; auto</td></tr>
-</table>
-<div class="info">
-  <strong>Param&egrave;tre status :</strong> <code>actif</code> (d&eacute;faut) = items actifs ; <code>hidden</code> = items vendu/vide (historique masqu&eacute;).
-</div>
-
-<h2 id="c5-3">5.3 Emplacements &amp; Grilles</h2>
-<table>
-  <tr><th>M&eacute;thode</th><th>Route</th><th>Description</th></tr>
-  <tr><td>GET</td><td><code>/api/locations?lieu=Garage</code></td><td>Lister les emplacements (avec compteur items)</td></tr>
-  <tr><td>POST</td><td><code>/api/locations</code></td><td>Cr&eacute;er un emplacement unitaire</td></tr>
-  <tr><td>GET</td><td><code>/api/grid?lieu=Garage</code></td><td>Lister les configurations de grille</td></tr>
-  <tr><td>POST</td><td><code>/api/grid</code></td><td>G&eacute;n&eacute;rer une grille (upsert config + cr&eacute;ation locations)</td></tr>
-  <tr><td>PUT</td><td><code>/api/grid/:id</code></td><td>Modifier dimensions (d&eacute;tache items hors grille)</td></tr>
-  <tr><td>DELETE</td><td><code>/api/grid/:id</code></td><td>Supprimer plan + d&eacute;tacher tous les items</td></tr>
-</table>
-
-<div class="info">
-  <strong>Comportement &agrave; la suppression/r&eacute;duction :</strong> Les items dans les casiers supprim&eacute;s sont automatiquement d&eacute;tach&eacute;s (<code>locationId = null</code>). Aucun item n'est perdu.
-</div>
-
-<h2 id="c5-4">5.4 Mouvements &amp; Export CSV</h2>
-<table>
-  <tr><th>M&eacute;thode</th><th>Route</th><th>Description</th></tr>
-  <tr><td>GET</td><td><code>/api/movements?type=&amp;search=&amp;hidden=true</code></td><td>Consulter l'historique (500 derniers max)</td></tr>
-  <tr><td>GET</td><td><code>/api/movements/export?reference=Outils&amp;hidden=false</code></td><td>T&eacute;l&eacute;charger le CSV (UTF-8 + BOM)</td></tr>
-</table>
-
-<h4>Format du fichier CSV export&eacute;</h4>
-<pre><code>Date,Article,Reference,Type,Description,Statut
-08/04/2026 14:32:00,"Cl&eacute; &agrave; molette",Outils,Ajout,"Ajout de ""Cl&eacute; &agrave; molette"" (Outils)",actif
-08/04/2026 15:10:00,"Huile 5W40",Consommables,Vide,"Statut chang&eacute; vers ""vide""",vide</code></pre>
-
-<h2 id="c5-5">5.5 Pr&ecirc;ts <code>/api/loans</code></h2>
-<table>
-  <tr><th>M&eacute;thode</th><th>Route</th><th>Description</th></tr>
-  <tr><td>GET</td><td><code>/api/loans?status=en_cours</code></td><td>Lister les pr&ecirc;ts (avec d&eacute;tail item)</td></tr>
-  <tr><td>POST</td><td><code>/api/loans</code></td><td>Cr&eacute;er un pr&ecirc;t + mouvement &laquo; Pret &raquo; auto</td></tr>
-  <tr><td>PUT</td><td><code>/api/loans/:id</code></td><td>Retour de pr&ecirc;t + mouvement &laquo; Rendu &raquo; auto</td></tr>
-</table>
-
-<h2 id="c5-6">5.6 Dashboard <code>/api/dashboard</code></h2>
-<table>
-  <tr><th>M&eacute;thode</th><th>Route</th><th>R&eacute;ponse</th></tr>
-  <tr><td>GET</td><td><code>/api/dashboard</code></td><td><code>{topOutils[], topConsommables[], activeLoans[], stats{}}</code></td></tr>
-</table>
-
-<h2 id="c5-7">5.7 Sauvegarde &amp; Restauration <code>/api/backup</code></h2>
-<table>
-  <tr><th>M&eacute;thode</th><th>Route</th><th>Description</th></tr>
-  <tr><td>GET</td><td><code>/api/backup</code></td><td>Export JSON complet (toutes les tables)</td></tr>
-  <tr><td>POST</td><td><code>/api/backup</code></td><td>Import JSON (supprime puis restaure toutes les donn&eacute;es)</td></tr>
-</table>
-
-<h4>Structure du fichier de sauvegarde</h4>
+<h3>POST /api/items</h3>
+<p>Cr&eacute;e un nouvel item. G&eacute;n&egrave;re automatiquement un mouvement de type <code>Ajout</code>.</p>
 <pre><code>{
-  "version": "1.0",
-  "date": "2026-04-08T12:00:00.000Z",
-  "data": {
-    "categories": [...],
-    "locations": [...],
-    "gridConfigs": [...],
-    "items": [...],
-    "movements": [...],
-    "loans": [...]
-  }
+  "name": "Cl&eacute; &agrave; molette 300mm",
+  "reference": "Outils",
+  "categoryId": 1,
+  "quantity": 2,
+  "unit": "unitaire",
+  "locationId": 15,
+  "description": "Cl&eacute; ajustable chrome-vanadium",
+  "photo": "data:image/jpeg;base64,...",
+  "minStock": null
 }</code></pre>
+<p><strong>R&eacute;ponse :</strong> 201 &mdash; Item cr&eacute;&eacute; avec relations.</p>
+
+<h3>GET /api/items/[id]</h3>
+<p>D&eacute;tail complet d'un item incluant : cat&eacute;gorie, emplacement, historique des mouvements et pr&ecirc;ts (tri&eacute;s par date d&eacute;croissante).</p>
+
+<h3>PUT /api/items/[id]</h3>
+<p>Met &agrave; jour un item. D&eacute;tecte automatiquement les changements et g&eacute;n&egrave;re les mouvements correspondants :</p>
+<ul>
+  <li>Changement de statut &rarr; mouvement <code>Vendu</code>, <code>Vide</code> ou <code>Reappro</code></li>
+  <li>Autres changements &rarr; mouvement <code>Modif</code> avec description d&eacute;taill&eacute;e</li>
+</ul>
+
+<h3>DELETE /api/items/[id]</h3>
+<p>Supprime un item. G&eacute;n&egrave;re un mouvement <code>Suppression</code> avant la suppression physique de l'enregistrement.</p>
+
+<h2 id="c5-2">5.2 Cat&eacute;gories</h2>
+
+<h3>GET /api/categories</h3>
+<p>Liste les cat&eacute;gories avec le nombre d'items associ&eacute;s. Filtre optionnel par <code>reference</code>.</p>
+
+<h3>POST /api/categories</h3>
+<pre><code>{ "name": "Limes", "reference": "Outils" }</code></pre>
+<p><strong>R&eacute;ponse :</strong> 201 &mdash; Cat&eacute;gorie cr&eacute;&eacute;e.</p>
+
+<h3>PUT /api/categories/[id]</h3>
+<p>Modifie le nom et/ou la r&eacute;f&eacute;rence d'une cat&eacute;gorie.</p>
+
+<h3>DELETE /api/categories/[id]</h3>
+<p>Supprime une cat&eacute;gorie. &Eacute;choue si des items y sont encore rattach&eacute;s.</p>
+
+<h2 id="c5-3">5.3 Lieux</h2>
+
+<h3>GET /api/lieux</h3>
+<p>Liste tous les lieux, tri&eacute;s par nom.</p>
+
+<h3>POST /api/lieux</h3>
+<pre><code>{ "name": "Atelier" }</code></pre>
+<p><strong>Validations :</strong> nom non vide, pas de doublon (insensible &agrave; la casse).</p>
+<p><strong>R&eacute;ponse :</strong> 201 &mdash; Lieu cr&eacute;&eacute;.</p>
+
+<h3>PUT /api/lieux/[id]</h3>
+<p>Renomme un lieu. <strong>Cascade automatique</strong> : met &agrave; jour le champ <code>lieu</code> dans toutes les tables <code>Location</code> et <code>GridConfig</code> associ&eacute;es.</p>
+
+<h3>DELETE /api/lieux/[id]</h3>
+<p>Supprime un lieu. <strong>&Eacute;choue</strong> (400) si des emplacements (Location) r&eacute;f&eacute;rencent encore ce lieu.</p>
+
+<h2 id="c5-4">5.4 Emplacements &amp; Grilles</h2>
+
+<h3>GET /api/locations</h3>
+<p>Liste les emplacements avec le nombre d'items. Filtres optionnels : <code>lieu</code>, <code>emplacement</code>.</p>
+
+<h3>POST /api/locations</h3>
+<pre><code>{ "lieu": "Garage", "emplacement": "E1", "ligne": "A", "colonne": 3 }</code></pre>
+
+<h3>PUT /api/locations/[id]</h3>
+<p>Modifie un emplacement.</p>
+
+<h3>DELETE /api/locations/[id]</h3>
+<p>&Eacute;choue (400) si des items sont assign&eacute;s &agrave; cet emplacement.</p>
+
+<h3>GET /api/grid</h3>
+<p>Liste les configurations de grille. Filtre optionnel par <code>lieu</code>.</p>
+
+<h3>POST /api/grid</h3>
+<p>Cr&eacute;e ou met &agrave; jour une grille (upsert sur <code>lieu + emplacement</code>). G&eacute;n&egrave;re automatiquement toutes les cases <code>Location</code> correspondantes (lignes A&rarr;Z, colonnes 1&rarr;N).</p>
+<pre><code>{ "lieu": "Garage", "emplacement": "E1", "rows": 4, "cols": 6 }</code></pre>
+
+<h3>PUT /api/grid/[id]</h3>
+<p>Redimensionne une grille. Supprime les cases vides hors limites et d&eacute;tache les items des cases supprim&eacute;es (locationId &rarr; null). Cr&eacute;e les nouvelles cases si la grille est agrandie.</p>
+
+<h3>DELETE /api/grid/[id]</h3>
+<p>Supprime une grille enti&egrave;re : d&eacute;tache tous les items et supprime toutes les cases Location associ&eacute;es.</p>
+
+<h2 id="c5-5">5.5 Mouvements &amp; Export CSV</h2>
+
+<h3>GET /api/movements</h3>
+<p>Historique des mouvements avec filtrage.</p>
+<table>
+  <tr><th>Param&egrave;tre</th><th>Type</th><th>Description</th></tr>
+  <tr><td><code>type</code></td><td>string</td><td>Filtre par type de mouvement</td></tr>
+  <tr><td><code>search</code></td><td>string</td><td>Recherche dans la description, le nom de l'item ou le type</td></tr>
+  <tr><td><code>hidden</code></td><td>boolean</td><td>Si <code>true</code>, filtre les types Vendu/Vide uniquement</td></tr>
+</table>
+<p><strong>Limite :</strong> 500 enregistrements maximum, tri&eacute;s par date d&eacute;croissante.</p>
+
+<h3>GET /api/movements/export</h3>
+<p>Exporte les mouvements au format CSV (encodage UTF-8 avec BOM).</p>
+<table>
+  <tr><th>Param&egrave;tre</th><th>Type</th><th>Description</th></tr>
+  <tr><td><code>reference</code></td><td>string</td><td>Filtre par type d'item</td></tr>
+  <tr><td><code>hidden</code></td><td>boolean</td><td>Inclure uniquement les items masqu&eacute;s (vendu/vide)</td></tr>
+</table>
+<p><strong>Colonnes CSV :</strong> Date, Article, R&eacute;f&eacute;rence, Type, Description, Statut.</p>
+
+<h2 id="c5-6">5.6 Pr&ecirc;ts</h2>
+
+<h3>GET /api/loans</h3>
+<p>Liste des pr&ecirc;ts. Filtre optionnel par <code>status</code> (en_cours, rendu).</p>
+
+<h3>POST /api/loans</h3>
+<pre><code>{
+  "itemId": 42,
+  "firstName": "Jean",
+  "lastName": "Dupont",
+  "expectedReturn": "2026-05-15"
+}</code></pre>
+<p>G&eacute;n&egrave;re automatiquement un mouvement de type <code>Pret</code>.</p>
+
+<h3>PUT /api/loans/[id]</h3>
+<pre><code>{ "status": "rendu" }</code></pre>
+<p>Passe le pr&ecirc;t en statut "rendu", enregistre la date de retour effective (<code>actualReturn</code>) et g&eacute;n&egrave;re un mouvement <code>Rendu</code>.</p>
+
+<h2 id="c5-7">5.7 Dashboard</h2>
+
+<h3>GET /api/dashboard</h3>
+<p>Retourne les donn&eacute;es agr&eacute;g&eacute;es du tableau de bord :</p>
+<table>
+  <tr><th>Champ</th><th>Description</th></tr>
+  <tr><td><code>stats</code></td><td>Totaux : items, outils, mat&eacute;riels, consommables</td></tr>
+  <tr><td><code>topOutils</code></td><td>Top 5 des outils les plus utilis&eacute;s (par nombre de mouvements)</td></tr>
+  <tr><td><code>topConsommables</code></td><td>Top 5 des consommables les plus utilis&eacute;s</td></tr>
+  <tr><td><code>activeLoans</code></td><td>Pr&ecirc;ts en cours avec informations de l'item</td></tr>
+  <tr><td><code>lowStockConsommables</code></td><td>Consommables dont la quantit&eacute; &le; stock minimum</td></tr>
+</table>
+
+<h2 id="c5-8">5.8 Sauvegarde &amp; Restauration</h2>
+
+<h3>GET /api/backup</h3>
+<p>Exporte l'int&eacute;gralit&eacute; de la base de donn&eacute;es en JSON. Le fichier contient :</p>
+<ul>
+  <li><code>version</code> : "1.0"</li>
+  <li><code>exportedAt</code> : timestamp ISO 8601</li>
+  <li><code>categories</code>, <code>lieux</code>, <code>locations</code>, <code>gridConfigs</code>, <code>items</code>, <code>movements</code>, <code>loans</code></li>
+</ul>
+<p>Le fichier est t&eacute;l&eacute;charg&eacute; automatiquement via <code>Content-Disposition: attachment</code>.</p>
+
+<h3>POST /api/backup</h3>
+<p>Restaure la base de donn&eacute;es depuis un fichier JSON. Op&eacute;ration destructive :</p>
+<ol>
+  <li>Validation du format du fichier</li>
+  <li>Suppression de toutes les donn&eacute;es existantes (dans l'ordre des d&eacute;pendances)</li>
+  <li>Restauration dans l'ordre inverse (avec conservation des identifiants)</li>
+</ol>
 
 <div class="warning">
-  <strong>Attention :</strong> La restauration <strong>remplace int&eacute;gralement</strong> toutes les donn&eacute;es. Effectuez toujours une sauvegarde avant de restaurer.
+  <strong>Attention :</strong> La restauration &eacute;crase toutes les donn&eacute;es existantes. Taille maximale accept&eacute;e : <strong>1 Go</strong> (configur&eacute; dans <code>next.config.ts</code> via <code>serverActions.bodySizeLimit</code>).
 </div>
 
 <!-- ============================================================ -->
@@ -578,73 +741,67 @@ docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts</code></pre>
 <h1 id="c6">6. Pages de l'application</h1>
 
 <h2 id="c6-1">6.1 Navigation (Sidebar)</h2>
-<p>Barre lat&eacute;rale fixe (256px) avec 5 liens, pr&eacute;sente sur toutes les pages :</p>
+<p>La barre lat&eacute;rale de navigation est pr&eacute;sente sur toutes les pages :</p>
 <table>
-  <tr><th>Ic&ocirc;ne</th><th>Label</th><th>Route</th><th>Description</th></tr>
-  <tr><td>&#127968;</td><td>Accueil</td><td><code>/</code></td><td>Tableau de bord avec statistiques</td></tr>
-  <tr><td>&#128295;</td><td>Outils</td><td><code>/outils</code></td><td>Inventaire outils</td></tr>
-  <tr><td>&#9881;&#65039;</td><td>Mat&eacute;riels</td><td><code>/materiels</code></td><td>Inventaire mat&eacute;riels</td></tr>
-  <tr><td>&#128230;</td><td>Consommables</td><td><code>/consommables</code></td><td>Inventaire consommables</td></tr>
-  <tr><td>&#9889;</td><td>Param&eacute;trage</td><td><code>/parametrage</code></td><td>Plans, cat&eacute;gories, backup</td></tr>
+  <tr><th>Ic&ocirc;ne</th><th>Lien</th><th>Page</th></tr>
+  <tr><td>&#x1F3E0;</td><td><code>/</code></td><td>Accueil (Dashboard)</td></tr>
+  <tr><td>&#x1F527;</td><td><code>/outils</code></td><td>Outils</td></tr>
+  <tr><td>&#x2699;&#xFE0F;</td><td><code>/materiels</code></td><td>Mat&eacute;riels</td></tr>
+  <tr><td>&#x1F4E6;</td><td><code>/consommables</code></td><td>Consommables</td></tr>
+  <tr><td>&#x26A1;</td><td><code>/parametrage</code></td><td>Param&eacute;trage</td></tr>
 </table>
+<ul>
+  <li><strong>Bureau :</strong> barre fixe &agrave; gauche (largeur 64px), contenu d&eacute;cal&eacute; avec <code>md:ml-64</code></li>
+  <li><strong>Mobile :</strong> menu hamburger, la sidebar glisse depuis la gauche avec un overlay. Se ferme automatiquement au changement de page ou au redimensionnement.</li>
+</ul>
 
 <h2 id="c6-2">6.2 Accueil (Dashboard)</h2>
-<p>La page d'accueil affiche :</p>
+<p>Page d'accueil (<code>src/app/page.tsx</code>) affichant un tableau de bord complet :</p>
 <ul>
-  <li><strong>4 cartes statistiques</strong> : Total items, Outils, Mat&eacute;riels, Consommables</li>
-  <li><strong>2 graphiques camembert</strong> (Recharts PieChart) c&ocirc;te &agrave; c&ocirc;te :
-    <ul>
-      <li>Top 10 outils les plus utilis&eacute;s (par nombre de mouvements)</li>
-      <li>Top 10 consommables les plus utilis&eacute;s</li>
-    </ul>
-  </li>
-  <li><strong>Tableau des pr&ecirc;ts en cours</strong> : Client, Article, Type, Date, Retour pr&eacute;vu (rouge si en retard)</li>
+  <li><strong>Compteurs</strong> : 4 cartes avec le nombre total d'items, outils, mat&eacute;riels et consommables</li>
+  <li><strong>Alerte stock bas</strong> : carte rouge listant les consommables dont la quantit&eacute; &le; stock minimum (avec nom, cat&eacute;gorie, quantit&eacute; actuelle, seuil minimum et emplacement)</li>
+  <li><strong>Graphiques camembert</strong> : Top 5 des outils et consommables les plus utilis&eacute;s (bas&eacute; sur le nombre de mouvements, rendu avec Recharts)</li>
+  <li><strong>Pr&ecirc;ts actifs</strong> : tableau des pr&ecirc;ts en cours avec client, article, type, date de pr&ecirc;t, date de retour pr&eacute;vue et indicateur de retard (&#x26A0;&#xFE0F;)</li>
 </ul>
 
 <h2 id="c6-3">6.3 Outils / Mat&eacute;riels / Consommables</h2>
-<p>Ces 3 pages partagent le m&ecirc;me composant <code>ItemListPage</code> param&eacute;tr&eacute; par r&eacute;f&eacute;rence :</p>
+<p>Les trois pages d'inventaire partagent la m&ecirc;me architecture :</p>
+<ul>
+  <li><strong>Composant principal</strong> : <code>ItemListPage</code> param&eacute;tr&eacute; avec la r&eacute;f&eacute;rence correspondante</li>
+  <li><strong>Composant secondaire</strong> : <code>MovementLog</code> pour l'historique et l'export CSV</li>
+</ul>
 
 <h4>Fonctionnalit&eacute;s de la liste</h4>
 <ul>
-  <li><strong>Barre de recherche</strong> : filtre en temps r&eacute;el sur nom, cat&eacute;gorie, r&eacute;f&eacute;rence</li>
-  <li><strong>Filtre par cat&eacute;gorie</strong> : menu d&eacute;roulant avec compteur d'items</li>
-  <li><strong>Grille responsive</strong> : 1 &agrave; 4 colonnes selon la largeur</li>
-  <li><strong>Miniatures cliquables</strong> : clic pour zoom plein &eacute;cran</li>
-  <li><strong>D&eacute;duplication</strong> : par ID automatique</li>
-  <li><strong>Tri</strong> : par cat&eacute;gorie (A-Z) puis par nom (A-Z)</li>
+  <li><strong>Recherche</strong> : champ de recherche par nom, cat&eacute;gorie ou r&eacute;f&eacute;rence</li>
+  <li><strong>Filtrage par cat&eacute;gorie</strong> : s&eacute;lecteur avec compteur d'items par cat&eacute;gorie</li>
+  <li><strong>Grille d'items</strong> : cartes avec photo, nom, quantit&eacute;, unit&eacute; et badges (pr&ecirc;ts actifs)</li>
+  <li><strong>Actions au survol</strong> : boutons Modifier et Supprimer</li>
+  <li><strong>Ajout</strong> : bouton ouvrant le formulaire de cr&eacute;ation (<code>ItemForm</code>)</li>
+  <li><strong>D&eacute;tail</strong> : clic sur une carte ouvre la fiche compl&egrave;te (<code>ItemDetailModal</code>)</li>
 </ul>
 
-<h4>Fiche d&eacute;tail (modal)</h4>
-<p>Au clic sur un item, un modal large s'ouvre avec :</p>
+<h4>Fiche d&eacute;tail (<code>ItemDetailModal</code>)</h4>
 <ul>
-  <li>Photo zoomable, tags (r&eacute;f&eacute;rence, cat&eacute;gorie, statut color&eacute;)</li>
-  <li>Quantit&eacute;, unit&eacute;, emplacement</li>
-  <li><strong>Boutons d'action contextuels</strong> :
-    <ul>
-      <li><strong>Pr&ecirc;ter</strong> : ouvre un formulaire de pr&ecirc;t (tous types)</li>
-      <li><strong>Vendu</strong> : change le statut (Mat&eacute;riels uniquement)</li>
-      <li><strong>Vide</strong> : change le statut (Consommables uniquement)</li>
-    </ul>
-  </li>
-  <li>Liste des pr&ecirc;ts en cours avec bouton &laquo; Rendu &raquo;</li>
-  <li>Historique complet des mouvements (color&eacute; par type)</li>
-</ul>
-
-<h4>Historique des mouvements</h4>
-<p>Sous la grille, deux boutons :</p>
-<ul>
-  <li><strong>Historique des mouvements</strong> : tous les mouvements filtrables + <strong>Export CSV</strong></li>
-  <li><strong>Historique masqu&eacute; (Vendu/Vide)</strong> : mouvements d'items vendus ou vides + <strong>Export CSV</strong></li>
+  <li>Photo avec zoom (ajout/modification/suppression de photo)</li>
+  <li>M&eacute;tadonn&eacute;es : r&eacute;f&eacute;rence, cat&eacute;gorie, statut avec badges color&eacute;s</li>
+  <li>Gestion du stock (consommables) : boutons +/- pour la quantit&eacute;, &eacute;dition du stock minimum</li>
+  <li>Actions : Pr&ecirc;ter, Marquer vendu, Marquer &eacute;puis&eacute;</li>
+  <li>Formulaire de pr&ecirc;t inline : pr&eacute;nom, nom, date de retour pr&eacute;vue</li>
+  <li>Pr&ecirc;ts actifs avec bouton "Retour" par pr&ecirc;t</li>
+  <li>Historique complet des mouvements avec horodatage et badges de type</li>
 </ul>
 
 <h2 id="c6-4">6.4 Param&eacute;trage</h2>
-<p>Page &agrave; 3 onglets :</p>
+<p>Page de configuration (<code>src/app/parametrage/page.tsx</code>) organis&eacute;e en 4 onglets :</p>
 <table>
   <tr><th>Onglet</th><th>Composant</th><th>Fonctionnalit&eacute;s</th></tr>
-  <tr><td>Plan 2D des casiers</td><td><code>GridPlan</code></td><td>G&eacute;n&eacute;rer, visualiser, modifier, supprimer des grilles</td></tr>
-  <tr><td>Cat&eacute;gories</td><td><code>CategoriesManager</code></td><td>CRUD complet, filtre par r&eacute;f&eacute;rence</td></tr>
-  <tr><td>Sauvegarde / Restauration</td><td><code>BackupRestore</code></td><td>Export JSON (backup) et import JSON (restore)</td></tr>
+  <tr><td><strong>Plan 2D</strong></td><td><code>GridPlan</code></td><td>G&eacute;rer les grilles de casiers (cr&eacute;ation, redimensionnement, suppression)</td></tr>
+  <tr><td><strong>Lieux</strong></td><td><code>LocationsManager</code></td><td>G&eacute;rer les lieux/b&acirc;timents (ajout, renommage, suppression)</td></tr>
+  <tr><td><strong>Cat&eacute;gories</strong></td><td><code>CategoriesManager</code></td><td>G&eacute;rer les cat&eacute;gories par type (ajout, &eacute;dition, suppression)</td></tr>
+  <tr><td><strong>Sauvegarde</strong></td><td><code>BackupRestore</code></td><td>Exporter/importer la base de donn&eacute;es compl&egrave;te</td></tr>
 </table>
+<p>Le composant <code>ThemeToggle</code> (bascule clair/sombre) est &eacute;galement affich&eacute; sur cette page.</p>
 
 <!-- ============================================================ -->
 <!-- CHAPITRE 7 -->
@@ -652,56 +809,49 @@ docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts</code></pre>
 <h1 id="c7">7. Plan 2D des casiers</h1>
 
 <h2 id="c7-1">7.1 G&eacute;n&eacute;ration de grille</h2>
-<p>Processus de cr&eacute;ation d'un plan :</p>
+<p>Le composant <code>GridPlan</code> (onglet &laquo; Plan 2D &raquo; du param&eacute;trage) permet de cr&eacute;er des grilles repr&eacute;sentant physiquement les meubles de rangement :</p>
 <ol>
-  <li>S&eacute;lectionner le <strong>Lieu</strong> (menu d&eacute;roulant : Grange, Grange_etage, Garage, Cabane_jardin)</li>
-  <li>Saisir l'<strong>Emplacement</strong> (E0, E1, E11...)</li>
-  <li>D&eacute;finir le <strong>nombre de lignes</strong> (1 &agrave; 26 &rarr; A &agrave; Z)</li>
-  <li>D&eacute;finir le <strong>nombre de colonnes</strong> (1 &agrave; 50)</li>
-  <li>Cliquer <strong>&laquo; G&eacute;n&eacute;rer le plan &raquo;</strong></li>
+  <li>S&eacute;lectionner un <strong>Lieu</strong> dans la liste d&eacute;roulante</li>
+  <li>Saisir un num&eacute;ro d'<strong>Emplacement</strong> (E0, E1, E2...)</li>
+  <li>D&eacute;finir le nombre de <strong>lignes</strong> (1-26, correspondant &agrave; A-Z) et de <strong>colonnes</strong></li>
+  <li>Cliquer &laquo; Cr&eacute;er la grille &raquo;</li>
 </ol>
-<p>L'API cr&eacute;e automatiquement une <code>GridConfig</code> et toutes les <code>Location</code> correspondantes via upsert.</p>
+<p>L'API effectue un <strong>upsert</strong> : si la grille existe d&eacute;j&agrave;, elle est mise &agrave; jour. Toutes les cases <code>Location</code> correspondantes sont g&eacute;n&eacute;r&eacute;es automatiquement.</p>
 
 <h2 id="c7-2">7.2 Indicateurs visuels</h2>
-
 <div class="grid-demo">
-  <div class="gh">&nbsp;</div><div class="gh">1</div><div class="gh">2</div><div class="gh">3</div><div class="gh">4</div>
-  <div class="gh">A</div><div class="cell-f">E0-A1<br><small>occup&eacute;</small></div><div class="cell-e">E0-A2</div><div class="cell-e">E0-A3</div><div class="cell-f">E0-A4<br><small>occup&eacute;</small></div>
-  <div class="gh">B</div><div class="cell-e">E0-B1</div><div class="cell-f">E0-B2<br><small>occup&eacute;</small></div><div class="cell-e">E0-B3</div><div class="cell-e">E0-B4</div>
-  <div class="gh">C</div><div class="cell-e">E0-C1</div><div class="cell-e">E0-C2</div><div class="cell-e">E0-C3</div><div class="cell-f">E0-C4<br><small>occup&eacute;</small></div>
+  <div class="gh"></div><div class="gh">1</div><div class="gh">2</div><div class="gh">3</div><div class="gh">4</div>
+  <div class="gh">A</div><div class="cell-f">Cl&eacute; plate<br>12mm</div><div class="cell-e">vide</div><div class="cell-f">Marteau</div><div class="cell-e">vide</div>
+  <div class="gh">B</div><div class="cell-e">vide</div><div class="cell-f">Tournevis<br>cruciforme</div><div class="cell-e">vide</div><div class="cell-f">Pince<br>coupante</div>
+  <div class="gh">C</div><div class="cell-f">Scie<br>&eacute;go&iuml;ne</div><div class="cell-e">vide</div><div class="cell-e">vide</div><div class="cell-e">vide</div>
 </div>
-
-<table>
-  <tr><th>&Eacute;tat</th><th>Fond</th><th>Bordure</th><th>Texte</th></tr>
-  <tr><td>Casier vide</td><td>Gris clair transparent</td><td>Pointill&eacute;e grise</td><td>Gris clair (garage-200)</td></tr>
-  <tr><td>Casier occup&eacute;</td><td>Bleu fonc&eacute; semi-transparent</td><td>Solide bleue</td><td>Blanc bleu (blue-100) + label &laquo; occup&eacute; &raquo;</td></tr>
-</table>
+<ul>
+  <li><span style="color:#3b82f6;">&#9632;</span> <strong>Case bleue</strong> : contient un ou plusieurs items</li>
+  <li><span style="color:#a8a29e;">&#9634;</span> <strong>Case grise pointill&eacute;e</strong> : case vide disponible</li>
+</ul>
 
 <h2 id="c7-3">7.3 Interaction avec un casier</h2>
-<p>Au clic sur une case, un <strong>modal</strong> s'ouvre avec :</p>
+<p>Cliquer sur une case ouvre un panneau lat&eacute;ral affichant :</p>
 <ul>
-  <li><strong>Titre</strong> : nom complet du casier (ex: &laquo; Garage &mdash; E0-B4 &raquo;)</li>
-  <li><strong>Liste des items</strong> pr&eacute;sents : miniature photo, nom, cat&eacute;gorie, quantit&eacute;, unit&eacute;</li>
-  <li><strong>Bouton &laquo; + Ajouter un &eacute;l&eacute;ment &raquo;</strong> : ouvre un formulaire <code>ItemForm</code> avec l'emplacement pr&eacute;-rempli</li>
+  <li>Les coordonn&eacute;es de la case (ex. : <code>Garage - E1-A3</code>)</li>
+  <li>La liste des items stock&eacute;s dans cette case (avec nom, cat&eacute;gorie, quantit&eacute;)</li>
+  <li>Un bouton <strong>&laquo; Ajouter un item ici &raquo;</strong> qui ouvre le formulaire avec l'emplacement pr&eacute;-s&eacute;lectionn&eacute;</li>
 </ul>
 
-<h2 id="c7-4">7.4 Modification et suppression</h2>
-<p>Chaque plan affich&eacute; dispose de deux boutons en haut &agrave; droite :</p>
-
-<h4>Bouton &laquo; Modifier &raquo;</h4>
+<h2 id="c7-4">7.4 Modification et suppression de grille</h2>
+<h4>Redimensionnement</h4>
 <ul>
-  <li>Ouvre un modal avec les dimensions actuelles (lignes / colonnes)</li>
-  <li>Le lieu et l'emplacement sont affich&eacute;s en lecture seule</li>
-  <li>Si la grille est <strong>r&eacute;duite</strong> : les items dans les casiers supprim&eacute;s sont <strong>d&eacute;tach&eacute;s</strong> (emplacement remis &agrave; vide)</li>
-  <li>Si la grille est <strong>agrandie</strong> : de nouvelles locations sont cr&eacute;&eacute;es</li>
+  <li>Ouvrir la modale d'&eacute;dition d'une grille existante</li>
+  <li>Modifier le nombre de lignes et/ou colonnes</li>
+  <li>Les cases vides hors des nouvelles limites sont supprim&eacute;es</li>
+  <li>Les items situ&eacute;s dans des cases supprim&eacute;es sont d&eacute;tach&eacute;s (<code>locationId</code> &rarr; <code>null</code>)</li>
+  <li>Les nouvelles cases (si agrandissement) sont cr&eacute;&eacute;es automatiquement</li>
 </ul>
-
-<h4>Bouton &laquo; Supprimer &raquo;</h4>
+<h4>Suppression</h4>
 <ul>
-  <li>Demande confirmation</li>
-  <li>D&eacute;tache tous les items de la grille (<code>locationId = null</code>)</li>
-  <li>Supprime toutes les locations et la configuration du plan</li>
-  <li><strong>Aucun item n'est perdu</strong> : ils passent simplement en &laquo; non assign&eacute; &raquo;</li>
+  <li>Confirmation requise avant suppression</li>
+  <li>Tous les items sont d&eacute;tach&eacute;s (<code>locationId</code> &rarr; <code>null</code>)</li>
+  <li>Toutes les cases <code>Location</code> et la <code>GridConfig</code> sont supprim&eacute;es</li>
 </ul>
 
 <!-- ============================================================ -->
@@ -710,256 +860,403 @@ docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts</code></pre>
 <h1 id="c8">8. Syst&egrave;me d'historique</h1>
 
 <h2 id="c8-1">8.1 G&eacute;n&eacute;ration automatique</h2>
-<p>Chaque changement d'&eacute;tat g&eacute;n&egrave;re <strong>automatiquement</strong> une entr&eacute;e dans la table <code>Movement</code> :</p>
-<table>
-  <tr><th>Action utilisateur</th><th>Type mouvement</th><th>Description g&eacute;n&eacute;r&eacute;e automatiquement</th></tr>
-  <tr><td>Cr&eacute;ation d'item</td><td><code>Ajout</code></td><td>&laquo; Ajout de "Nom" (R&eacute;f) &raquo;</td></tr>
-  <tr><td>Modification de champs</td><td><code>Modif</code></td><td>D&eacute;tail des champs modifi&eacute;s (Nom: X &rarr; Y, Quantit&eacute;: 5 &rarr; 3)</td></tr>
-  <tr><td>Suppression d'item</td><td><code>Suppression</code></td><td>&laquo; Suppression de "Nom" &raquo;</td></tr>
-  <tr><td>Cr&eacute;ation de pr&ecirc;t</td><td><code>Pret</code></td><td>&laquo; Pr&ecirc;t &agrave; Pr&eacute;nom Nom - retour pr&eacute;vu le JJ/MM/AAAA &raquo;</td></tr>
-  <tr><td>Retour de pr&ecirc;t</td><td><code>Rendu</code></td><td>&laquo; Retour de pr&ecirc;t par Pr&eacute;nom Nom &raquo;</td></tr>
-  <tr><td>Marquage &laquo; Vendu &raquo;</td><td><code>Vendu</code></td><td>&laquo; Statut chang&eacute; vers "vendu" &raquo;</td></tr>
-  <tr><td>Marquage &laquo; Vide &raquo;</td><td><code>Vide</code></td><td>&laquo; Statut chang&eacute; vers "vide" &raquo;</td></tr>
-</table>
+<p>Chaque action significative sur un item g&eacute;n&egrave;re automatiquement un enregistrement dans la table <code>Movement</code>. Le syst&egrave;me construit des descriptions d&eacute;taill&eacute;es :</p>
+<ul>
+  <li><strong>Ajout</strong> : &laquo; Article ajout&eacute; &agrave; l'inventaire &raquo;</li>
+  <li><strong>Modification</strong> : description incluant chaque champ modifi&eacute; (ex. : &laquo; Quantit&eacute; : 5 &rarr; 3, Cat&eacute;gorie : Cl&eacute;s &rarr; Tournevis &raquo;)</li>
+  <li><strong>Suppression</strong> : &laquo; Article supprim&eacute; de l'inventaire &raquo;</li>
+  <li><strong>Pr&ecirc;t / Retour</strong> : identit&eacute; de l'emprunteur et date de retour pr&eacute;vue</li>
+  <li><strong>Statut</strong> : &laquo; Article marqu&eacute; comme vendu/&eacute;puis&eacute; &raquo; ou &laquo; R&eacute;approvisionn&eacute; &agrave; X unit&eacute;(s) &raquo;</li>
+</ul>
 
 <h2 id="c8-2">8.2 Consultation et filtrage</h2>
-<p>Deux journaux accessibles depuis chaque page (Outils, Mat&eacute;riels, Consommables) via des boutons sous la liste :</p>
+<p>Le composant <code>MovementLog</code> propose deux vues :</p>
+<table>
+  <tr><th>Vue</th><th>Contenu</th></tr>
+  <tr><td><strong>Historique des mouvements</strong></td><td>Tous les mouvements actifs (Ajout, Modif, Suppression, Pret, Rendu)</td></tr>
+  <tr><td><strong>Historique masqu&eacute;</strong></td><td>Items vendus ou &eacute;puis&eacute;s (types Vendu, Vide)</td></tr>
+</table>
+<p>Chaque vue inclut :</p>
 <ul>
-  <li><strong>Historique des mouvements</strong> : tous les mouvements, filtrable par recherche texte libre</li>
-  <li><strong>Historique masqu&eacute; (Vendu/Vide)</strong> : uniquement les mouvements de type Vendu et Vide</li>
+  <li>Recherche textuelle</li>
+  <li>Affichage chronologique avec horodatage, nom de l'item, badge de type color&eacute; et description</li>
+  <li>Bouton <strong>&laquo; R&eacute;approvisionn&eacute; &raquo;</strong> dans l'historique masqu&eacute; pour remettre un item en service avec une nouvelle quantit&eacute;</li>
 </ul>
-<p>Chaque entr&eacute;e affiche : date, nom de l'article, badge color&eacute; du type, description.</p>
 
 <h2 id="c8-3">8.3 Export CSV</h2>
-<p>Chaque modal d'historique dispose d'un bouton <strong>&laquo; Exporter CSV &raquo;</strong> qui :</p>
-<ul>
-  <li>T&eacute;l&eacute;charge un fichier <code>.csv</code> encod&eacute; en <strong>UTF-8 avec BOM</strong> (compatible Excel)</li>
-  <li>Colonnes : Date, Article, Reference, Type, Description, Statut</li>
-  <li>Filtre automatiquement par la r&eacute;f&eacute;rence de l'onglet courant (Outils, Materiels, Consommables)</li>
-  <li>Nom du fichier : <code>historique_Outils_mouvements.csv</code> ou <code>historique_Outils_masque.csv</code></li>
-</ul>
+<p>Chaque vue d'historique dispose d'un bouton d'export CSV. Le fichier g&eacute;n&eacute;r&eacute; contient :</p>
+<table>
+  <tr><th>Colonne</th><th>Description</th></tr>
+  <tr><td>Date</td><td>Date et heure du mouvement</td></tr>
+  <tr><td>Article</td><td>Nom de l'item</td></tr>
+  <tr><td>R&eacute;f&eacute;rence</td><td>Type (Outils, Materiels, Consommables)</td></tr>
+  <tr><td>Type</td><td>Type de mouvement</td></tr>
+  <tr><td>Description</td><td>D&eacute;tails du mouvement</td></tr>
+  <tr><td>Statut</td><td>Statut actuel de l'item</td></tr>
+</table>
+<p>L'encodage UTF-8 avec BOM garantit la compatibilit&eacute; avec Excel et LibreOffice.</p>
 
 <!-- ============================================================ -->
 <!-- CHAPITRE 9 -->
 <!-- ============================================================ -->
 <h1 id="c9">9. Gestion des pr&ecirc;ts</h1>
 
-<h3>Cr&eacute;ation d'un pr&ecirc;t</h3>
+<h2 id="c9-1">9.1 Cr&eacute;ation d'un pr&ecirc;t</h2>
+<p>Depuis la fiche d&eacute;tail d'un item (<code>ItemDetailModal</code>) :</p>
 <ol>
-  <li>Ouvrir la fiche d&eacute;tail d'un item actif</li>
-  <li>Cliquer <strong>&laquo; Pr&ecirc;ter &raquo;</strong></li>
-  <li>Remplir : Pr&eacute;nom, Nom, Date de retour pr&eacute;vue</li>
-  <li>Valider &rarr; mouvement <code>Pret</code> g&eacute;n&eacute;r&eacute; automatiquement</li>
+  <li>Cliquer sur le bouton &laquo; Pr&ecirc;ter &raquo;</li>
+  <li>Remplir le formulaire : <strong>pr&eacute;nom</strong>, <strong>nom</strong>, <strong>date de retour pr&eacute;vue</strong></li>
+  <li>Valider &rarr; le pr&ecirc;t est cr&eacute;&eacute; avec le statut <code>en_cours</code></li>
+  <li>Un mouvement <code>Pret</code> est enregistr&eacute; automatiquement</li>
 </ol>
 
-<h3>Retour d'un pr&ecirc;t</h3>
+<h2 id="c9-2">9.2 Retour d'un pr&ecirc;t</h2>
 <ol>
-  <li>Ouvrir la fiche d&eacute;tail de l'item</li>
-  <li>Dans &laquo; Pr&ecirc;ts en cours &raquo;, cliquer <strong>&laquo; Rendu &raquo;</strong></li>
-  <li>Statut &rarr; <code>rendu</code>, date de retour effectif enregistr&eacute;e, mouvement <code>Rendu</code> cr&eacute;&eacute;</li>
+  <li>Dans la fiche d&eacute;tail, les pr&ecirc;ts actifs sont affich&eacute;s avec un bouton &laquo; Retour &raquo;</li>
+  <li>Cliquer sur &laquo; Retour &raquo; &rarr; le statut passe &agrave; <code>rendu</code></li>
+  <li>La date de retour effective (<code>actualReturn</code>) est enregistr&eacute;e</li>
+  <li>Un mouvement <code>Rendu</code> est g&eacute;n&eacute;r&eacute;</li>
 </ol>
 
-<h3>Suivi sur le Dashboard</h3>
-<p>Tableau central listant tous les pr&ecirc;ts actifs. Les retours en retard sont signal&eacute;s en <span style="color:red;font-weight:bold;">rouge avec &#9888;</span>.</p>
+<h2 id="c9-3">9.3 Alertes de retard</h2>
+<p>Le tableau de bord affiche les pr&ecirc;ts en cours. Si la date de retour pr&eacute;vue est d&eacute;pass&eacute;e, un indicateur <strong>&#x26A0;&#xFE0F; En retard</strong> appara&icirc;t dans la colonne statut.</p>
 
 <!-- ============================================================ -->
 <!-- CHAPITRE 10 -->
 <!-- ============================================================ -->
-<h1 id="c10">10. Sauvegarde et restauration</h1>
+<h1 id="c10">10. Gestion des stocks (Consommables)</h1>
 
-<p>Accessible dans <strong>Param&eacute;trage &rarr; onglet &laquo; Sauvegarde / Restauration &raquo;</strong>.</p>
-
-<h3>Sauvegarde (Export)</h3>
+<h2 id="c10-1">10.1 Stock minimum</h2>
+<p>Chaque consommable peut avoir un seuil de <strong>stock minimum</strong> (<code>minStock</code>). Ce champ est configurable :</p>
 <ul>
-  <li>Bouton <strong>&laquo; T&eacute;l&eacute;charger la sauvegarde &raquo;</strong></li>
-  <li>Exporte l'int&eacute;gralit&eacute; de la base (6 tables) dans un fichier JSON</li>
-  <li>Nom : <code>toolmap_backup_2026-04-08.json</code></li>
-  <li>Inclut : categories, items (avec photos Base64), locations, gridConfigs, movements, loans</li>
+  <li>&Agrave; la cr&eacute;ation via le formulaire <code>ItemForm</code> (champ visible uniquement pour la r&eacute;f&eacute;rence Consommables)</li>
+  <li>Depuis la fiche d&eacute;tail (<code>ItemDetailModal</code>) avec &eacute;dition inline</li>
 </ul>
 
-<h3>Restauration (Import)</h3>
-<ul>
-  <li>Bouton <strong>&laquo; Restaurer depuis un fichier &raquo;</strong> (rouge, indique le danger)</li>
-  <li>Demande de <strong>confirmation</strong> avant ex&eacute;cution</li>
-  <li>Processus :
-    <ol>
-      <li>Suppression de toutes les donn&eacute;es existantes (dans l'ordre des d&eacute;pendances)</li>
-      <li>Insertion des donn&eacute;es du fichier (dans l'ordre des d&eacute;pendances)</li>
-      <li>Conservation des IDs originaux</li>
-    </ol>
-  </li>
-  <li>Message de succ&egrave;s ou d'erreur affich&eacute;</li>
-</ul>
+<h2 id="c10-2">10.2 Alertes de stock bas</h2>
+<p>Le Dashboard affiche une carte d'alerte rouge lorsque des consommables ont une quantit&eacute; inf&eacute;rieure ou &eacute;gale au stock minimum :</p>
+<table>
+  <tr><th>Colonne</th><th>Information</th></tr>
+  <tr><td>Article</td><td>Nom du consommable</td></tr>
+  <tr><td>Cat&eacute;gorie</td><td>Cat&eacute;gorie associ&eacute;e</td></tr>
+  <tr><td>Quantit&eacute;</td><td>Quantit&eacute; actuelle</td></tr>
+  <tr><td>Min.</td><td>Seuil de stock minimum</td></tr>
+  <tr><td>Emplacement</td><td>Localisation physique</td></tr>
+</table>
 
-<div class="warning">
-  <strong>Pr&eacute;caution :</strong> Toujours effectuer une sauvegarde avant toute restauration. L'op&eacute;ration est irr&eacute;versible.
-</div>
+<h2 id="c10-3">10.3 R&eacute;approvisionnement</h2>
+<p>Deux m&eacute;thodes pour r&eacute;approvisionner un consommable :</p>
+<ul>
+  <li><strong>Fiche d&eacute;tail</strong> : boutons +/- pour ajuster la quantit&eacute; directement</li>
+  <li><strong>Historique masqu&eacute;</strong> : bouton &laquo; R&eacute;approvisionn&eacute; &raquo; pour remettre un item &eacute;puis&eacute; en service avec une nouvelle quantit&eacute; (repasse le statut &agrave; <code>actif</code> et g&eacute;n&egrave;re un mouvement <code>Reappro</code>)</li>
+</ul>
 
 <!-- ============================================================ -->
 <!-- CHAPITRE 11 -->
 <!-- ============================================================ -->
-<h1 id="c11">11. Th&egrave;me et design</h1>
+<h1 id="c11">11. Sauvegarde et restauration</h1>
 
-<h2>11.1 Palette de couleurs &laquo; Garage-friendly &raquo;</h2>
-<table>
-  <tr><th>Nom Tailwind</th><th>Hex</th><th>Aper&ccedil;u</th><th>Utilisation</th></tr>
-  <tr><td>garage-50</td><td>#f5f5f4</td><td><span class="color-swatch" style="background:#f5f5f4;"></span></td><td>Texte tr&egrave;s clair</td></tr>
-  <tr><td>garage-100</td><td>#e7e5e4</td><td><span class="color-swatch" style="background:#e7e5e4;"></span></td><td>Texte principal</td></tr>
-  <tr><td>garage-200</td><td>#d6d3d1</td><td><span class="color-swatch" style="background:#d6d3d1;"></span></td><td>Texte casiers</td></tr>
-  <tr><td>garage-400</td><td>#78716c</td><td><span class="color-swatch" style="background:#78716c;"></span></td><td>Bordures casiers</td></tr>
-  <tr><td>garage-500</td><td>#57534e</td><td><span class="color-swatch" style="background:#57534e;"></span></td><td>Bordures inputs/cartes</td></tr>
-  <tr><td>garage-600</td><td>#44403c</td><td><span class="color-swatch" style="background:#44403c;"></span></td><td>Fond cartes</td></tr>
-  <tr><td>garage-700</td><td>#292524</td><td><span class="color-swatch" style="background:#292524;"></span></td><td><strong>Fond page (body)</strong></td></tr>
-  <tr><td>garage-800</td><td>#1c1917</td><td><span class="color-swatch" style="background:#1c1917;"></span></td><td>Fond modals</td></tr>
-  <tr><td>garage-950</td><td>#050403</td><td><span class="color-swatch" style="background:#050403;"></span></td><td>Sidebar</td></tr>
-  <tr><td>accent</td><td>#f97316</td><td><span class="color-swatch" style="background:#f97316;"></span></td><td><strong>Couleur accent (boutons, titres, nav active)</strong></td></tr>
-</table>
+<p>Le composant <code>BackupRestore</code> (onglet &laquo; Sauvegarde &raquo; du param&eacute;trage) permet :</p>
 
-<h2>11.2 Classes CSS personnalis&eacute;es</h2>
-<table>
-  <tr><th>Classe</th><th>Description</th></tr>
-  <tr><td><code>.btn-primary</code></td><td>Bouton orange accent, texte blanc</td></tr>
-  <tr><td><code>.btn-secondary</code></td><td>Bouton gris fonc&eacute; avec bordure</td></tr>
-  <tr><td><code>.btn-danger</code></td><td>Bouton rouge</td></tr>
-  <tr><td><code>.card</code></td><td>Carte avec fond garage-600, bordure, coins arrondis, ombre</td></tr>
-  <tr><td><code>.input-field</code></td><td>Champ de saisie sombre, focus ring accent</td></tr>
-  <tr><td><code>.select-field</code></td><td>S&eacute;lecteur sombre, focus ring accent</td></tr>
-</table>
+<h3>Sauvegarde (Export)</h3>
+<ul>
+  <li>Cliquer sur &laquo; T&eacute;l&eacute;charger la sauvegarde &raquo;</li>
+  <li>Un fichier JSON est t&eacute;l&eacute;charg&eacute; contenant l'int&eacute;gralit&eacute; de la base</li>
+  <li>Format : version 1.0, timestamp d'export, toutes les tables</li>
+</ul>
+
+<h3>Restauration (Import)</h3>
+<ul>
+  <li>Cliquer sur &laquo; Restaurer depuis un fichier &raquo;</li>
+  <li>S&eacute;lectionner un fichier <code>.json</code> pr&eacute;c&eacute;demment export&eacute;</li>
+  <li>Bo&icirc;te de dialogue de confirmation (avertissement de perte de donn&eacute;es)</li>
+  <li>Processus : validation du format &rarr; suppression &rarr; restauration &rarr; message de succ&egrave;s</li>
+</ul>
+
+<div class="warning">
+  <strong>Taille maximale :</strong> 1 Go. Ce param&egrave;tre est configur&eacute; dans <code>next.config.ts</code> via <code>experimental.serverActions.bodySizeLimit</code>. Pour les bases volumineuses (nombreuses photos en base64), v&eacute;rifiez que cette limite est suffisante.
+</div>
 
 <!-- ============================================================ -->
 <!-- CHAPITRE 12 -->
 <!-- ============================================================ -->
-<h1 id="c12">12. Composants React</h1>
+<h1 id="c12">12. Th&egrave;me et design</h1>
 
-<p>L'application comprend <strong>9 composants r&eacute;utilisables</strong> dans <code>src/components/</code> :</p>
+<h2 id="c12-1">12.1 Mode clair / sombre</h2>
+<p>Le syst&egrave;me de th&egrave;me est g&eacute;r&eacute; par deux composants :</p>
+<ul>
+  <li><strong><code>ThemeProvider</code></strong> : contexte React qui g&egrave;re l'&eacute;tat du th&egrave;me et le persiste dans <code>localStorage</code> (cl&eacute; : <code>toolmap-theme</code>). D&eacute;finit l'attribut <code>data-theme</code> sur l'&eacute;l&eacute;ment <code>&lt;html&gt;</code>.</li>
+  <li><strong><code>ThemeToggle</code></strong> : bouton de bascule avec ic&ocirc;ne lune/soleil, visible dans la page Param&eacute;trage.</li>
+</ul>
+<p>La bascule est instantan&eacute;e et persistante entre les sessions. Un flag <code>mounted</code> &eacute;vite les probl&egrave;mes d'hydratation SSR.</p>
+
+<h2 id="c12-2">12.2 Design responsive</h2>
+<p>L'interface s'adapte &agrave; 3 cat&eacute;gories d'&eacute;crans :</p>
+<table>
+  <tr><th>Taille</th><th>Adaptations</th></tr>
+  <tr><td><strong>Mobile</strong> (&lt; 768px)</td><td>Sidebar cach&eacute;e (hamburger), grilles en 1 colonne, modales plein &eacute;cran, boutons tactiles</td></tr>
+  <tr><td><strong>Tablette</strong> (768-1024px)</td><td>Sidebar fixe, grilles en 2-3 colonnes</td></tr>
+  <tr><td><strong>Bureau</strong> (&gt; 1024px)</td><td>Layout complet, grilles en 3-4 colonnes</td></tr>
+</table>
+
+<h2 id="c12-3">12.3 Palette de couleurs</h2>
+<p>La configuration Tailwind d&eacute;finit deux ensembles de couleurs personnalis&eacute;s :</p>
+
+<h4>Palette &laquo; garage &raquo; (11 nuances via variables CSS)</h4>
+<table>
+  <tr><th>Nom</th><th>Utilisation</th></tr>
+  <tr><td><code>garage-50</code> &agrave; <code>garage-100</code></td><td>Textes clairs, bordures subtiles</td></tr>
+  <tr><td><code>garage-200</code> &agrave; <code>garage-400</code></td><td>Arri&egrave;re-plans de cartes, inputs</td></tr>
+  <tr><td><code>garage-500</code> &agrave; <code>garage-700</code></td><td>Arri&egrave;re-plans principaux</td></tr>
+  <tr><td><code>garage-800</code> &agrave; <code>garage-950</code></td><td>Arri&egrave;re-plan g&eacute;n&eacute;ral, sidebar</td></tr>
+</table>
+
+<h4>Couleur d'accent</h4>
+<p><span class="color-swatch" style="background:#f97316;"></span> <strong>Orange (#f97316)</strong> avec variantes <code>accent-light</code> et <code>accent-dark</code>. Utilis&eacute;e pour les boutons primaires, titres et &eacute;l&eacute;ments interactifs.</p>
+
+<h4>Classes utilitaires CSS</h4>
+<table>
+  <tr><th>Classe</th><th>Description</th></tr>
+  <tr><td><code>.btn-primary</code></td><td>Bouton orange avec hover plus fonc&eacute;</td></tr>
+  <tr><td><code>.btn-secondary</code></td><td>Bouton gris avec bordure</td></tr>
+  <tr><td><code>.btn-danger</code></td><td>Bouton rouge (actions destructives)</td></tr>
+  <tr><td><code>.card</code></td><td>Carte avec fond, bordure, arrondi et ombre</td></tr>
+  <tr><td><code>.input-field</code></td><td>Champ de saisie avec focus accent</td></tr>
+  <tr><td><code>.select-field</code></td><td>S&eacute;lecteur avec m&ecirc;me style que input</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<!-- CHAPITRE 13 -->
+<!-- ============================================================ -->
+<h1 id="c13">13. Composants React</h1>
+
+<p>R&eacute;capitulatif des 13 composants du dossier <code>src/components/</code> :</p>
 
 <table>
   <tr><th>Composant</th><th>Props principales</th><th>R&ocirc;le</th></tr>
-  <tr><td><code>Sidebar</code></td><td>&mdash;</td><td>Navigation lat&eacute;rale avec d&eacute;tection de route active</td></tr>
-  <tr><td><code>Modal</code></td><td>isOpen, onClose, title, size</td><td>Fen&ecirc;tre modale g&eacute;n&eacute;rique (sm/md/lg/xl), fermeture Escape</td></tr>
-  <tr><td><code>ImageZoom</code></td><td>src, alt</td><td>Miniature 64x64 avec zoom plein &eacute;cran au clic</td></tr>
-  <tr><td><code>ItemForm</code></td><td>reference, onSave, onCancel, initial?, presetLocationId?</td><td>Formulaire cr&eacute;ation/&eacute;dition item avec upload photo Base64</td></tr>
-  <tr><td><code>ItemListPage</code></td><td>reference, title</td><td>Liste filtr&eacute;e + recherche + grille responsive</td></tr>
-  <tr><td><code>ItemDetailModal</code></td><td>itemId, onClose, onRefresh</td><td>Fiche d&eacute;tail : historique, pr&ecirc;ts, actions Vendu/Vide</td></tr>
-  <tr><td><code>MovementLog</code></td><td>reference</td><td>Historique des mouvements + historique masqu&eacute; + export CSV</td></tr>
-  <tr><td><code>CategoriesManager</code></td><td>&mdash;</td><td>CRUD cat&eacute;gories avec filtre par r&eacute;f&eacute;rence</td></tr>
-  <tr><td><code>GridPlan</code></td><td>&mdash;</td><td>Plan 2D interactif : g&eacute;n&eacute;ration, affichage, modification, suppression</td></tr>
-  <tr><td><code>BackupRestore</code></td><td>&mdash;</td><td>Sauvegarde JSON et restauration avec confirmation</td></tr>
+  <tr>
+    <td><code>Sidebar</code></td>
+    <td>&mdash;</td>
+    <td>Navigation principale. G&egrave;re le mode mobile (hamburger + overlay) et bureau (fixe). Fermeture auto au changement de route.</td>
+  </tr>
+  <tr>
+    <td><code>Modal</code></td>
+    <td><code>isOpen</code>, <code>onClose</code>, <code>title</code>, <code>size</code></td>
+    <td>Modale r&eacute;utilisable avec 4 tailles (sm/md/lg/xl). Supporte Escape et clic ext&eacute;rieur. En-t&ecirc;te sticky, corps scrollable.</td>
+  </tr>
+  <tr>
+    <td><code>ImageZoom</code></td>
+    <td><code>src</code>, <code>alt</code></td>
+    <td>Miniature 16x16 cliquable. Clic ouvre un zoom plein &eacute;cran avec overlay noir. Fallback &laquo; N/A &raquo; si pas d'image.</td>
+  </tr>
+  <tr>
+    <td><code>ItemForm</code></td>
+    <td><code>reference</code>, <code>onSave</code>, <code>onCancel</code>, <code>initial?</code>, <code>presetLocationId?</code></td>
+    <td>Formulaire cr&eacute;ation/&eacute;dition d'item. Champs : nom, description, quantit&eacute;, unit&eacute;, cat&eacute;gorie, emplacement, photo, stock min. (consommables). Validation c&ocirc;t&eacute; client.</td>
+  </tr>
+  <tr>
+    <td><code>ItemListPage</code></td>
+    <td><code>reference</code>, <code>title</code></td>
+    <td>Page d'inventaire compl&egrave;te. Recherche, filtre par cat&eacute;gorie, grille de cartes, cr&eacute;ation/&eacute;dition/suppression, ouverture de la fiche d&eacute;tail.</td>
+  </tr>
+  <tr>
+    <td><code>ItemDetailModal</code></td>
+    <td><code>itemId</code>, <code>onClose</code>, <code>onRefresh</code></td>
+    <td>Fiche d&eacute;tail compl&egrave;te d'un item. Photo avec zoom, gestion stock (consommables), pr&ecirc;ts, actions de statut, historique des mouvements.</td>
+  </tr>
+  <tr>
+    <td><code>MovementLog</code></td>
+    <td><code>reference</code></td>
+    <td>Historique des mouvements avec deux modales (actifs et masqu&eacute;s). Recherche, badges color&eacute;s par type, bouton r&eacute;approvisionnement, export CSV.</td>
+  </tr>
+  <tr>
+    <td><code>GridPlan</code></td>
+    <td>&mdash;</td>
+    <td>Plan 2D interactif. S&eacute;lection lieu/emplacement, cr&eacute;ation de grilles, affichage CSS Grid, clic sur case pour voir/ajouter des items, &eacute;dition et suppression de grilles.</td>
+  </tr>
+  <tr>
+    <td><code>LocationsManager</code></td>
+    <td>&mdash;</td>
+    <td>CRUD des lieux (b&acirc;timents/zones). Affichage en pilules, ajout inline, renommage (cascade), suppression avec v&eacute;rification de d&eacute;pendances.</td>
+  </tr>
+  <tr>
+    <td><code>CategoriesManager</code></td>
+    <td>&mdash;</td>
+    <td>CRUD des cat&eacute;gories. Filtre par r&eacute;f&eacute;rence, grille avec compteur d'items, modale de cr&eacute;ation/&eacute;dition, suppression inline.</td>
+  </tr>
+  <tr>
+    <td><code>BackupRestore</code></td>
+    <td>&mdash;</td>
+    <td>Sauvegarde et restauration de la base. T&eacute;l&eacute;chargement JSON, import avec confirmation, messages d'&eacute;tat.</td>
+  </tr>
+  <tr>
+    <td><code>ThemeProvider</code></td>
+    <td><code>children</code></td>
+    <td>Contexte React pour le th&egrave;me (clair/sombre). Persistance localStorage, attribut data-theme, anti-flash d'hydratation.</td>
+  </tr>
+  <tr>
+    <td><code>ThemeToggle</code></td>
+    <td>&mdash;</td>
+    <td>Bouton bascule lune/soleil. Affiche le th&egrave;me actuel. Transitions fluides.</td>
+  </tr>
 </table>
 
 <!-- ============================================================ -->
 <!-- ANNEXES -->
 <!-- ============================================================ -->
-<h1 id="annexes">13. Annexes</h1>
+<h1 id="annexes">14. Annexes</h1>
 
-<h2 id="a-a">Annexe A &mdash; Commandes utiles</h2>
-<pre><code># === D&eacute;marrage ===
-docker compose up -d --build        # Construire et lancer
-docker compose down                  # Arr&ecirc;ter
-docker compose down -v               # Arr&ecirc;ter + supprimer les donn&eacute;es
-
-# === Logs ===
-docker compose logs -f web           # Logs Next.js en temps r&eacute;el
-docker compose logs -f db            # Logs MySQL en temps r&eacute;el
-
-# === Base de donn&eacute;es ===
-docker exec toolmap-web ./node_modules/.bin/prisma db push    # Appliquer le sch&eacute;ma
-docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts # Seed cat&eacute;gories
-docker exec -it toolmap-db mysql -u toolmap -ptoolmap_pass_2024 toolmap  # Shell MySQL
-
-# === SSL ===
-./generate-ssl.sh                    # Reg&eacute;n&eacute;rer les certificats
-
-# === Maintenance ===
-docker compose restart web           # Red&eacute;marrer Next.js
-docker system prune -f               # Nettoyer les images/conteneurs inutilis&eacute;s</code></pre>
-
-<h2 id="a-b">Annexe B &mdash; Cycle de vie d'un Item</h2>
-<pre><code>
-  [Cr&eacute;ation] ─── mouvement "Ajout"
-      │
-      ▼
-  ┌─────────┐
-  │  ACTIF  │ ◄── &Eacute;tat initial par d&eacute;faut
-  └────┬────┘
-       │
-       ├── Modification ──── mouvement "Modif"
-       │
-       ├── Pr&ecirc;t ──── mouvement "Pret"
-       │     └── Retour ──── mouvement "Rendu" ──► retour &agrave; ACTIF
-       │
-       ├── Vendu (Mat&eacute;riels) ──── mouvement "Vendu"
-       │     └──► Dispara&icirc;t de la recherche active
-       │          Visible dans l'historique masqu&eacute;
-       │
-       ├── Vide (Consommables) ──── mouvement "Vide"
-       │     └──► Dispara&icirc;t de la recherche active
-       │          Visible dans l'historique masqu&eacute;
-       │
-       └── Suppression ──── mouvement "Suppression"
-             └──► Item supprim&eacute; de la base
-</code></pre>
-
-<h2 id="a-c">Annexe C &mdash; Flux de donn&eacute;es (cr&eacute;ation d'item)</h2>
-<pre><code>
-Navigateur (client)
-  │
-  │  POST /api/items
-  │  Body: { name, reference, photo, categoryId, locationId, ... }
-  │
-  ▼
-Next.js API Route ── src/app/api/items/route.ts
-  │
-  │  1. prisma.item.create(data)     → INSERT INTO Item
-  │  2. prisma.movement.create(...)  → INSERT INTO Movement (type: "Ajout")
-  │
-  ▼
-MySQL (via Prisma Client)
-  │
-  ▼
-R&eacute;ponse JSON 201 → Client met &agrave; jour la liste via re-fetch
-</code></pre>
-
-<h2 id="a-d">Annexe D &mdash; Format des photos</h2>
-<p>Les photos sont stock&eacute;es dans le champ <code>photo</code> (LONGTEXT) sous forme de <strong>Data URI Base64</strong> :</p>
-<pre><code>data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAA...</code></pre>
+<h2 id="a-a">A. Commandes utiles</h2>
 <table>
-  <tr><th>Limite</th><th>Valeur</th><th>Configuration</th></tr>
-  <tr><td>Taille upload Next.js</td><td>10 MB</td><td><code>next.config.ts</code> &rarr; serverActions.bodySizeLimit</td></tr>
-  <tr><td>Taille paquet MySQL</td><td>64 MB</td><td><code>docker-compose.yml</code> &rarr; max_allowed_packet</td></tr>
+  <tr><th>Commande</th><th>Description</th></tr>
+  <tr><td><code>docker compose up -d --build</code></td><td>Construire et lancer les conteneurs</td></tr>
+  <tr><td><code>docker compose down</code></td><td>Arr&ecirc;ter les conteneurs</td></tr>
+  <tr><td><code>docker compose logs -f web</code></td><td>Suivre les logs de l'application</td></tr>
+  <tr><td><code>docker compose logs -f db</code></td><td>Suivre les logs MySQL</td></tr>
+  <tr><td><code>docker exec -it toolmap-db mysql -utoolmap -p toolmap</code></td><td>Acc&eacute;der au shell MySQL</td></tr>
+  <tr><td><code>docker exec toolmap-web npx prisma db push</code></td><td>Appliquer le sch&eacute;ma &agrave; la base</td></tr>
+  <tr><td><code>docker exec toolmap-web npx tsx prisma/seed.ts</code></td><td>Ins&eacute;rer les cat&eacute;gories par d&eacute;faut</td></tr>
+  <tr><td><code>docker exec toolmap-web npx prisma studio</code></td><td>Ouvrir Prisma Studio (GUI)</td></tr>
+  <tr><td><code>npm run dev</code></td><td>Lancer le serveur de d&eacute;veloppement</td></tr>
+  <tr><td><code>npm run build</code></td><td>Build de production</td></tr>
+  <tr><td><code>npm run db:push</code></td><td>Synchroniser le sch&eacute;ma (dev local)</td></tr>
+  <tr><td><code>npm run db:seed</code></td><td>Seed de la base (dev local)</td></tr>
 </table>
 
-<h2 id="a-e">Annexe E &mdash; S&eacute;curit&eacute;</h2>
-<table>
-  <tr><th>Mesure</th><th>D&eacute;tail</th></tr>
-  <tr><td>HTTPS</td><td>Obligatoire, port 443, certificat SSL</td></tr>
-  <tr><td>Injection SQL</td><td>Prot&eacute;g&eacute; par Prisma ORM (requ&ecirc;tes param&eacute;tr&eacute;es)</td></tr>
-  <tr><td>XSS</td><td>Prot&eacute;g&eacute; par React (escape automatique du JSX)</td></tr>
-  <tr><td>Mots de passe</td><td>Configurables via variables d'environnement</td></tr>
-  <tr><td>Upload</td><td>Limit&eacute; &agrave; 10 MB par fichier</td></tr>
-  <tr><td>Authentification</td><td>Non impl&eacute;ment&eacute;e (application locale/intranet)</td></tr>
-</table>
+<h2 id="a-b">B. Cycle de vie d'un Item</h2>
+<pre><code>
+  ┌──────────┐     ┌─────────┐     ┌─────────────┐
+  │  Cr&eacute;&eacute;   │────▶│  Actif  │────▶│  Modifi&eacute;   │──┐
+  │ (Ajout)  │     │         │     │  (Modif)    │  │
+  └──────────┘     └────┬────┘     └─────────────┘  │
+                        │                            │
+                        ▼                            │
+                   ┌─────────┐                       │
+                   │ Pr&ecirc;t&eacute;  │◀──────────────────────┘
+                   │ (Pret)  │
+                   └────┬────┘
+                        │
+                        ▼
+                   ┌─────────┐
+                   │  Rendu  │──────────▶ Retour &agrave; Actif
+                   │ (Rendu) │
+                   └─────────┘
 
-<div class="note">
-  <strong>Recommandation :</strong> Si l'application est expos&eacute;e sur Internet, ajoutez une couche d'authentification (NextAuth.js ou similaire) et utilisez un certificat SSL valide (Let's Encrypt).
+  Depuis Actif :
+  ├──▶ Vendu (Vendu) ──▶ Masqu&eacute; dans l'historique
+  ├──▶ Vide (&Eacute;puis&eacute;) ──▶ Masqu&eacute; (r&eacute;approvisionnement possible)
+  └──▶ Supprim&eacute; (Suppression) ──▶ Retir&eacute; de la base
+</code></pre>
+
+<h2 id="a-c">C. Flux de donn&eacute;es</h2>
+<pre><code>
+  Utilisateur (navigateur)
+       │
+       ▼ HTTPS :443
+  ┌─────────────────────┐
+  │    server.js         │  Reverse proxy TLS
+  │    (HTTPS :443)      │
+  └──────────┬──────────┘
+             │ HTTP :3000
+             ▼
+  ┌─────────────────────┐
+  │  Next.js Standalone  │  App Router + API Routes
+  │  (server.standalone) │
+  └──────────┬──────────┘
+             │ Prisma Client
+             ▼
+  ┌─────────────────────┐
+  │    Prisma ORM        │  Requ&ecirc;tes type-safe
+  └──────────┬──────────┘
+             │ MySQL Protocol :3306
+             ▼
+  ┌─────────────────────┐
+  │    MySQL 8.0         │  Volume persistant
+  │    (toolmap-db)      │
+  └─────────────────────┘
+</code></pre>
+
+<h2 id="a-d">D. Format des photos</h2>
+<ul>
+  <li><strong>Stockage</strong> : les photos sont encod&eacute;es en <strong>Base64</strong> et stock&eacute;es dans le champ <code>photo</code> (type <code>LONGTEXT</code> MySQL)</li>
+  <li><strong>Format</strong> : la cha&icirc;ne inclut le pr&eacute;fixe MIME (ex. : <code>data:image/jpeg;base64,...</code>)</li>
+  <li><strong>Upload</strong> : via <code>&lt;input type="file" accept="image/*"&gt;</code> dans <code>ItemForm</code>, conversion en base64 c&ocirc;t&eacute; client</li>
+  <li><strong>Affichage</strong> : miniature dans la grille d'items, zoom plein &eacute;cran via <code>ImageZoom</code></li>
+  <li><strong>Modification</strong> : ajout, remplacement et suppression de photo depuis <code>ItemDetailModal</code></li>
+  <li><strong>Limite MySQL</strong> : <code>max_allowed_packet=64M</code> dans docker-compose pour supporter les images volumineuses</li>
+</ul>
+
+<h2 id="a-e">E. S&eacute;curit&eacute;</h2>
+<ul>
+  <li><strong>HTTPS</strong> : toutes les communications sont chiffr&eacute;es via TLS</li>
+  <li><strong>Pas d'authentification</strong> : l'application est con&ccedil;ue pour un usage local/intranet. Aucun syst&egrave;me de login n'est impl&eacute;ment&eacute;.</li>
+  <li><strong>Injection SQL</strong> : Prisma ORM param&egrave;tre toutes les requ&ecirc;tes, &eacute;liminant les risques d'injection</li>
+  <li><strong>XSS</strong> : React &eacute;chappe automatiquement les contenus affich&eacute;s dans le DOM</li>
+  <li><strong>Mots de passe</strong> : les identifiants par d&eacute;faut (MySQL) <strong>doivent</strong> &ecirc;tre chang&eacute;s en production</li>
+  <li><strong>Certificats</strong> : remplacer les certificats auto-sign&eacute;s par des certificats valides (Let's Encrypt) en production</li>
+  <li><strong>NODE_TLS_REJECT_UNAUTHORIZED</strong> : d&eacute;fini &agrave; <code>0</code> pour le d&eacute;veloppement, &agrave; supprimer en production avec de vrais certificats</li>
+</ul>
+
+<div class="warning">
+  <strong>Recommandations production :</strong>
+  <ul>
+    <li>Changer tous les mots de passe par d&eacute;faut</li>
+    <li>Utiliser des certificats SSL valides</li>
+    <li>Restreindre l'acc&egrave;s r&eacute;seau (firewall, VPN)</li>
+    <li>Sauvegarder r&eacute;guli&egrave;rement la base de donn&eacute;es</li>
+    <li>Ajouter une couche d'authentification si expos&eacute; sur Internet</li>
+  </ul>
 </div>
 
-<h2 id="a-f">Annexe F &mdash; D&eacute;pannage</h2>
+<h2 id="a-f">F. D&eacute;pannage</h2>
+
 <table>
   <tr><th>Probl&egrave;me</th><th>Cause probable</th><th>Solution</th></tr>
-  <tr><td>Page blanche / erreur 502</td><td>Next.js pas encore d&eacute;marr&eacute;</td><td><code>docker compose logs web</code> &mdash; attendre &laquo; Ready &raquo;</td></tr>
-  <tr><td>Erreur connexion BDD</td><td>MySQL pas encore healthy</td><td>Attendre 30s, v&eacute;rifier <code>docker compose logs db</code></td></tr>
-  <tr><td>Certificat SSL refus&eacute;</td><td>Certificat auto-sign&eacute;</td><td>Accepter l'exception dans le navigateur</td></tr>
-  <tr><td>Prisma schema error</td><td>BDD non initialis&eacute;e</td><td><code>docker exec toolmap-web ./node_modules/.bin/prisma db push</code></td></tr>
-  <tr><td>Cat&eacute;gories manquantes</td><td>Seed non ex&eacute;cut&eacute;</td><td><code>docker exec toolmap-web ./node_modules/.bin/tsx prisma/seed.ts</code></td></tr>
-  <tr><td>Photo trop volumineuse</td><td>D&eacute;passe 10 MB</td><td>Compresser l'image avant upload</td></tr>
-  <tr><td>Conteneur en restart loop</td><td>Erreur au d&eacute;marrage</td><td><code>docker compose logs web --tail 50</code> pour diagnostiquer</td></tr>
+  <tr>
+    <td>Page blanche au lancement</td>
+    <td>La base MySQL n'est pas pr&ecirc;te</td>
+    <td>V&eacute;rifier <code>docker compose logs db</code>. Attendre le healthcheck ou relancer <code>docker compose restart web</code>.</td>
+  </tr>
+  <tr>
+    <td>Erreur &laquo; Connection refused &raquo;</td>
+    <td>Le conteneur web ne peut pas joindre MySQL</td>
+    <td>V&eacute;rifier que le service <code>db</code> est healthy : <code>docker compose ps</code>. V&eacute;rifier le <code>DATABASE_URL</code>.</td>
+  </tr>
+  <tr>
+    <td>Certificat SSL invalide</td>
+    <td>Certificats non g&eacute;n&eacute;r&eacute;s ou expir&eacute;s</td>
+    <td>Ex&eacute;cuter <code>./generate-ssl.sh</code> et relancer les conteneurs.</td>
+  </tr>
+  <tr>
+    <td>Erreur &laquo; Packet too large &raquo;</td>
+    <td>Photo ou backup trop volumineux</td>
+    <td>V&eacute;rifier <code>max_allowed_packet</code> dans docker-compose (64M par d&eacute;faut). Augmenter si n&eacute;cessaire.</td>
+  </tr>
+  <tr>
+    <td>Restauration &eacute;choue</td>
+    <td>Format JSON invalide ou taille &gt; 1 Go</td>
+    <td>V&eacute;rifier le fichier JSON. Augmenter <code>bodySizeLimit</code> dans <code>next.config.ts</code> si n&eacute;cessaire.</td>
+  </tr>
+  <tr>
+    <td>Sch&eacute;ma non &agrave; jour</td>
+    <td>Mod&egrave;le Prisma modifi&eacute; sans migration</td>
+    <td>Ex&eacute;cuter <code>docker exec toolmap-web npx prisma db push</code></td>
+  </tr>
+  <tr>
+    <td>Items disparus apr&egrave;s redimensionnement de grille</td>
+    <td>Items d&eacute;tach&eacute;s des cases supprim&eacute;es</td>
+    <td>Les items sont toujours pr&eacute;sents mais sans emplacement (<code>locationId = null</code>). R&eacute;assigner manuellement.</td>
+  </tr>
+  <tr>
+    <td>Th&egrave;me ne change pas</td>
+    <td>Cache localStorage</td>
+    <td>Vider le localStorage du navigateur (cl&eacute; <code>toolmap-theme</code>) et recharger.</td>
+  </tr>
 </table>
 
-<br>
 <footer>
-  <p><strong>ToolMap v1.0</strong> &mdash; Documentation technique compl&egrave;te</p>
-  <p>G&eacute;n&eacute;r&eacute;e en avril 2026 &mdash; 43 fichiers source &bull; 6 mod&egrave;les &bull; 12 endpoints &bull; 9 composants</p>
+  <p><strong>ToolMap</strong> &mdash; Documentation technique compl&egrave;te &mdash; Version 1.0 &mdash; Avril 2026</p>
+  <p>Next.js 15 &bull; React 19 &bull; TypeScript 5 &bull; Prisma 6 &bull; MySQL 8 &bull; Tailwind CSS 3.4 &bull; Docker</p>
 </footer>
 
 </body>
