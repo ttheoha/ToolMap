@@ -84,6 +84,22 @@ export default function ImportCSV() {
           <label className="block text-sm text-garage-300 mb-1">Fichier CSV</label>
           <input ref={fileRef} type="file" accept=".csv,.txt" onChange={handleFile} className="input-field text-sm" />
         </div>
+        <button
+          onClick={() => {
+            const bom = "\uFEFF";
+            const csv = bom + "nom;catégorie;description;quantité;unité\nClé à molette;Clés;Clé ajustable 250mm;2;unitaire\nHuile moteur 5W30;Lubrifiants;Bidon 5L;3;litre\n";
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "import_exemple.csv";
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
+          className="btn-secondary text-sm h-10"
+        >
+          Exemple CSV
+        </button>
       </div>
 
       <p className="text-xs text-garage-500">
