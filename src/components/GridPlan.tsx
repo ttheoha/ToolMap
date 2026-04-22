@@ -40,9 +40,11 @@ interface ItemInLocation {
 interface GridPlanProps {
   initialLieu?: string;
   initialEmplacement?: string;
+  initialLigne?: string;
+  initialColonne?: number;
 }
 
-export default function GridPlan({ initialLieu, initialEmplacement }: GridPlanProps = {}) {
+export default function GridPlan({ initialLieu, initialEmplacement, initialLigne, initialColonne }: GridPlanProps = {}) {
   const [lieuxList, setLieuxList] = useState<LieuType[]>([]);
   const [lieu, setLieu] = useState(initialLieu || "");
   const [emplacement, setEmplacement] = useState(initialEmplacement || "E0");
@@ -63,6 +65,9 @@ export default function GridPlan({ initialLieu, initialEmplacement }: GridPlanPr
   const [assignSearch, setAssignSearch] = useState("");
   const [assigningId, setAssigningId] = useState<number | null>(null);
   const [addItemReference, setAddItemReference] = useState("Outils");
+
+  // Animate target cell from query params
+  const [animatingCell, setAnimatingCell] = useState<{ ligne: string; colonne: number } | null>(null);
 
   // Search item on grid
   const [gridSearch, setGridSearch] = useState("");
@@ -85,6 +90,15 @@ export default function GridPlan({ initialLieu, initialEmplacement }: GridPlanPr
   }, [lieu]);
 
   useEffect(() => { loadGrids(); }, [loadGrids]);
+
+  // Trigger animation when navigating from localiser
+  useEffect(() => {
+    if (initialLigne && initialColonne && grids.length > 0) {
+      setAnimatingCell({ ligne: initialLigne, colonne: initialColonne });
+      const timer = setTimeout(() => setAnimatingCell(null), 2400);
+      return () => clearTimeout(timer);
+    }
+  }, [initialLigne, initialColonne, grids]);
 
   useEffect(() => {
     setHighlightedLocationId(null);
@@ -379,16 +393,19 @@ export default function GridPlan({ initialLieu, initialEmplacement }: GridPlanPr
                 </div>
                 {row.map((cell, ci) => {
                   const isHighlighted = highlightedLocationId !== null && cell.locationId === highlightedLocationId;
+                  const isAnimating = animatingCell && animatingCell.ligne === cell.ligne && animatingCell.colonne === cell.colonne;
                   return (
                     <button
                       key={ci}
                       onClick={() => handleCellClick(cell.ligne, cell.colonne, cell.locationId)}
                       className={`w-20 h-20 m-0.5 rounded-lg flex flex-col items-center justify-center text-xs transition-all hover:scale-105 shrink-0 ${
-                        isHighlighted
-                          ? "bg-accent/30 border-2 border-accent text-accent ring-2 ring-accent/50 scale-110"
-                          : cell.hasItems
-                            ? "bg-blue-900/60 border-2 border-blue-500 text-blue-100 hover:bg-blue-800/60"
-                            : "bg-garage-600/40 border-2 border-dashed border-garage-400 text-garage-200 hover:border-garage-300"
+                        isAnimating
+                          ? "bg-accent/40 border-2 border-accent text-accent ring-2 ring-accent/60 animate-[pulse-cell_0.8s_ease-in-out_3]"
+                          : isHighlighted
+                            ? "bg-accent/30 border-2 border-accent text-accent ring-2 ring-accent/50 scale-110"
+                            : cell.hasItems
+                              ? "bg-blue-900/60 border-2 border-blue-500 text-blue-100 hover:bg-blue-800/60"
+                              : "bg-garage-600/40 border-2 border-dashed border-garage-400 text-garage-200 hover:border-garage-300"
                       }`}
                     >
                       <span className="font-mono font-semibold">{emplacement}-{cell.ligne}{cell.colonne}</span>

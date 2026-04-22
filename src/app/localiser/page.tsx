@@ -83,7 +83,7 @@ function LocaliserContent() {
                     </p>
                   </div>
                   <Link
-                    href={`/parametrage?lieu=${encodeURIComponent(item.location.lieu)}&emplacement=${item.location.emplacement}`}
+                    href={`/parametrage?lieu=${encodeURIComponent(item.location.lieu)}&emplacement=${item.location.emplacement}&ligne=${item.location.ligne}&colonne=${item.location.colonne}`}
                     className="btn-primary text-xs py-1.5 px-3 shrink-0"
                   >
                     Voir sur le plan

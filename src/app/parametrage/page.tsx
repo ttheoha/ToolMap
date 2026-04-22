@@ -14,6 +14,8 @@ function ParametrageContent() {
   const [tab, setTab] = useState<"plan" | "lieux" | "categories" | "backup">("plan");
   const initialLieu = searchParams.get("lieu") || undefined;
   const initialEmplacement = searchParams.get("emplacement") || undefined;
+  const initialLigne = searchParams.get("ligne") || undefined;
+  const initialColonne = searchParams.get("colonne") ? Number(searchParams.get("colonne")) : undefined;
 
   useEffect(() => {
     if (initialLieu) setTab("plan");
@@ -62,7 +64,7 @@ function ParametrageContent() {
         </button>
       </div>
 
-      {tab === "plan" && <GridPlan initialLieu={initialLieu} initialEmplacement={initialEmplacement} />}
+      {tab === "plan" && <GridPlan initialLieu={initialLieu} initialEmplacement={initialEmplacement} initialLigne={initialLigne} initialColonne={initialColonne} />}
       {tab === "lieux" && <LocationsManager />}
       {tab === "categories" && <CategoriesManager />}
       {tab === "backup" && (
