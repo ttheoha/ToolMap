@@ -11,8 +11,9 @@ export const config = {
 
 // Export full database as JSON
 export async function GET() {
-  const [categories, items, locations, gridConfigs, movements, loans] = await Promise.all([
+  const [categories, lieux, items, locations, gridConfigs, movements, loans] = await Promise.all([
     prisma.category.findMany(),
+    prisma.lieu.findMany(),
     prisma.item.findMany(),
     prisma.location.findMany(),
     prisma.gridConfig.findMany(),
@@ -23,7 +24,7 @@ export async function GET() {
   const backup = {
     version: "1.0",
     date: new Date().toISOString(),
-    data: { categories, locations, gridConfigs, items, movements, loans },
+    data: { categories, lieux, locations, gridConfigs, items, movements, loans },
   };
 
   const json = JSON.stringify(backup, null, 2);
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Format de sauvegarde invalide" }, { status: 400 });
     }
 
-    const { categories, locations, gridConfigs, items, movements, loans } = backup.data;
+    const { categories, lieux, locations, gridConfigs, items, movements, loans } = backup.data;
 
     // Delete all existing data in reverse dependency order
     await prisma.movement.deleteMany();
@@ -54,6 +55,7 @@ export async function POST(request: NextRequest) {
     await prisma.location.deleteMany();
     await prisma.gridConfig.deleteMany();
     await prisma.category.deleteMany();
+    await prisma.lieu.deleteMany();
 
     // Restore in dependency order
     if (categories?.length) {
@@ -62,6 +64,14 @@ export async function POST(request: NextRequest) {
         name: c.name as string,
         reference: c.reference as string,
         createdAt: new Date(c.createdAt as string),
+      }))});
+    }
+
+    if (lieux?.length) {
+      await prisma.lieu.createMany({ data: lieux.map((l: Record<string, unknown>) => ({
+        id: l.id as number,
+        name: l.name as string,
+        createdAt: new Date(l.createdAt as string),
       }))});
     }
 
