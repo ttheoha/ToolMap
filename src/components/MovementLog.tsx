@@ -115,7 +115,7 @@ export default function MovementLog({ reference }: { reference: string }) {
                   onChange={e => setRestockQty(Number(e.target.value))}
                   className="input-field w-20 text-sm"
                 />
-                <button onClick={() => handleRestock(m.item.id)} className="btn-primary text-xs py-1 px-3">
+                <button onClick={() => handleRestock(m.item!.id)} className="btn-primary text-xs py-1 px-3">
                   Confirmer
                 </button>
                 <button onClick={() => setRestockId(null)} className="btn-secondary text-xs py-1 px-2">
