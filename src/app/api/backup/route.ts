@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       // Helper to write base64 image to disk
       const saveBase64ToDisk = async (base64: string): Promise<string | null> => {
         try {
-          const match = base64.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/s);
+          const match = base64.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
           if (!match) return null;
           const ext = match[1] === "jpeg" ? "jpg" : match[1].replace("+", "");
           const buffer = Buffer.from(match[2], "base64");
