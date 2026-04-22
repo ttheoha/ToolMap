@@ -10,7 +10,9 @@ export default function ImportCSV() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const parseCSV = (text: string): Record<string, string>[] => {
-    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    // Strip BOM
+    const clean = text.replace(/^\uFEFF/, "");
+    const lines = clean.split(/\r?\n/).filter(l => l.trim());
     if (lines.length < 2) return [];
 
     // Detect separator
