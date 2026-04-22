@@ -18,7 +18,11 @@ export async function GET(request: NextRequest) {
   } else {
     where.status = status;
   }
-  if (locationId) where.locationId = parseInt(locationId);
+  if (locationId === "none") {
+    where.locationId = null;
+  } else if (locationId) {
+    where.locationId = parseInt(locationId);
+  }
   if (search) {
     where.OR = [
       { name: { contains: search } },

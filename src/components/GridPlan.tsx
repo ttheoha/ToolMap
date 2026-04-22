@@ -51,6 +51,10 @@ export default function GridPlan() {
   const [cellItems, setCellItems] = useState<ItemInLocation[]>([]);
   const [cellLocationId, setCellLocationId] = useState<number | null>(null);
   const [showAddItem, setShowAddItem] = useState(false);
+  const [showAssignExisting, setShowAssignExisting] = useState(false);
+  const [unassignedItems, setUnassignedItems] = useState<ItemInLocation[]>([]);
+  const [assignSearch, setAssignSearch] = useState("");
+  const [assigningId, setAssigningId] = useState<number | null>(null);
 
   // Load lieux list
   useEffect(() => {
@@ -122,11 +126,37 @@ export default function GridPlan() {
     }
   };
 
+  const loadUnassignedItems = async (search?: string) => {
+    const params = new URLSearchParams({ locationId: "none", status: "actif" });
+    if (search) params.set("search", search);
+    const items = await fetch(`/api/items?${params}`).then(r => r.json());
+    setUnassignedItems(items);
+  };
+
+  const handleAssignItem = async (itemId: number) => {
+    if (!cellLocationId) return;
+    setAssigningId(itemId);
+    await fetch(`/api/items/${itemId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ locationId: cellLocationId }),
+    });
+    setAssigningId(null);
+    setShowAssignExisting(false);
+    setAssignSearch("");
+    if (selectedCell) {
+      handleCellClick(selectedCell.ligne, selectedCell.colonne, cellLocationId);
+    }
+    loadGrids();
+  };
+
   const closeCell = () => {
     setSelectedCell(null);
     setCellItems([]);
     setCellLocationId(null);
     setShowAddItem(false);
+    setShowAssignExisting(false);
+    setAssignSearch("");
   };
 
   const [editingGrid, setEditingGrid] = useState<GridConfig | null>(null);
@@ -289,13 +319,18 @@ export default function GridPlan() {
       >
         {selectedCell && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <h3 className="text-sm text-garage-400">
                 Contenu du casier {selectedCell.emplacement}-{selectedCell.ligne}{selectedCell.colonne}
               </h3>
-              <button onClick={() => setShowAddItem(true)} className="btn-primary text-sm">
-                + Ajouter un élément
-              </button>
+              <div className="flex gap-2">
+                <button onClick={() => { setShowAssignExisting(true); setShowAddItem(false); loadUnassignedItems(); }} className="btn-secondary text-sm">
+                  + Élément existant
+                </button>
+                <button onClick={() => { setShowAddItem(true); setShowAssignExisting(false); }} className="btn-primary text-sm">
+                  + Nouvel élément
+                </button>
+              </div>
             </div>
 
             {cellItems.length === 0 ? (
@@ -311,6 +346,43 @@ export default function GridPlan() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {showAssignExisting && cellLocationId && (
+              <div className="border-t border-garage-700 pt-4">
+                <h3 className="text-sm font-semibold text-accent mb-3">Ajouter un élément existant</h3>
+                <input
+                  value={assignSearch}
+                  onChange={e => { setAssignSearch(e.target.value); loadUnassignedItems(e.target.value); }}
+                  placeholder="Rechercher un élément sans casier..."
+                  className="input-field w-full mb-3"
+                />
+                {unassignedItems.length === 0 ? (
+                  <p className="text-garage-500 text-center py-4 text-sm">Aucun élément sans casier trouvé</p>
+                ) : (
+                  <div className="space-y-1 max-h-60 overflow-y-auto">
+                    {unassignedItems.map(item => (
+                      <div key={item.id} className="flex items-center gap-3 bg-garage-700 rounded-lg px-3 py-2">
+                        {item.photo && <img src={item.photo} alt={item.name} className="w-8 h-8 object-cover rounded" />}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm truncate">{item.name}</h4>
+                          <p className="text-xs text-garage-400">{item.category.name} — {item.quantity} {item.unit}</p>
+                        </div>
+                        <button
+                          onClick={() => handleAssignItem(item.id)}
+                          disabled={assigningId === item.id}
+                          className="btn-primary text-xs px-2 py-1 shrink-0"
+                        >
+                          {assigningId === item.id ? "..." : "Assigner"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="flex justify-end pt-3">
+                  <button onClick={() => { setShowAssignExisting(false); setAssignSearch(""); }} className="btn-secondary text-sm">Annuler</button>
+                </div>
               </div>
             )}
 
