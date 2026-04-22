@@ -37,4 +37,6 @@ COPY --from=base /app/server.js ./server.js
 
 EXPOSE 443
 
+RUN mkdir -p /app/public/uploads
+
 CMD ["sh", "-c", "npx prisma db push --skip-generate && node server.js"]

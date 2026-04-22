@@ -56,8 +56,25 @@ export default function ItemForm({ reference, onSave, onCancel, initial, presetL
   const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("La photo ne doit pas dépasser 2 Mo");
+      return;
+    }
     const reader = new FileReader();
-    reader.onload = () => setPhoto(reader.result as string);
+    reader.onload = async () => {
+      const base64 = reader.result as string;
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photo: base64 }),
+      });
+      if (res.ok) {
+        const { path } = await res.json();
+        setPhoto(path);
+      } else {
+        alert("Erreur lors de l'upload de la photo");
+      }
+    };
     reader.readAsDataURL(file);
   };
 

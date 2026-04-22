@@ -3,3 +3,5 @@ node_modules/
 ssl/
 *.pem
 .env.local
+public/uploads/*
+!public/uploads/.gitkeep

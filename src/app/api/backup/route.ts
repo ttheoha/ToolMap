@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { readFile, writeFile, mkdir } from "fs/promises";
+import path from "path";
+import crypto from "crypto";
 
 export const config = {
   api: {
@@ -21,10 +24,28 @@ export async function GET() {
     prisma.loan.findMany(),
   ]);
 
+  // Embed photo files as base64 in backup
+  const itemsWithPhotos = await Promise.all(
+    items.map(async (item) => {
+      if (item.photo && item.photo.startsWith("/uploads/")) {
+        try {
+          const filePath = path.join(process.cwd(), "public", item.photo);
+          const buffer = await readFile(filePath);
+          const ext = path.extname(item.photo).slice(1);
+          const mime = ext === "jpg" ? "jpeg" : ext;
+          return { ...item, _photoBase64: `data:image/${mime};base64,${buffer.toString("base64")}` };
+        } catch {
+          return item;
+        }
+      }
+      return item;
+    })
+  );
+
   const backup = {
     version: "1.0",
     date: new Date().toISOString(),
-    data: { categories, lieux, locations, gridConfigs, items, movements, loans },
+    data: { categories, lieux, locations, gridConfigs, items: itemsWithPhotos, movements, loans },
   };
 
   const json = JSON.stringify(backup, null, 2);
@@ -98,21 +119,54 @@ export async function POST(request: NextRequest) {
     }
 
     if (items?.length) {
-      await prisma.item.createMany({ data: items.map((i: Record<string, unknown>) => ({
-        id: i.id as number,
-        name: i.name as string,
-        reference: i.reference as string,
-        photo: (i.photo as string) || null,
-        description: (i.description as string) || null,
-        quantity: i.quantity as number,
-        minStock: (i.minStock as number) || null,
-        unit: i.unit as string,
-        categoryId: i.categoryId as number,
-        locationId: (i.locationId as number) || null,
-        status: i.status as string,
-        createdAt: new Date(i.createdAt as string),
-        updatedAt: new Date(i.updatedAt as string),
-      }))});
+      const uploadsDir = path.join(process.cwd(), "public", "uploads");
+      await mkdir(uploadsDir, { recursive: true });
+
+      // Restore photos from base64 to filesystem
+      const itemsData = await Promise.all(items.map(async (i: Record<string, unknown>) => {
+        let photo = (i.photo as string) || null;
+        const photoBase64 = i._photoBase64 as string | undefined;
+
+        if (photoBase64) {
+          // Backup contains embedded base64 photo — write it to disk
+          const match = photoBase64.match(/^data:image\/(\w+);base64,(.+)$/);
+          if (match) {
+            const ext = match[1] === "jpeg" ? "jpg" : match[1];
+            const buffer = Buffer.from(match[2], "base64");
+            const filename = `${crypto.randomUUID()}.${ext}`;
+            await writeFile(path.join(uploadsDir, filename), buffer);
+            photo = `/uploads/${filename}`;
+          }
+        } else if (photo && photo.startsWith("data:image/")) {
+          // Legacy backup with base64 directly in photo field — write to disk
+          const match = photo.match(/^data:image\/(\w+);base64,(.+)$/);
+          if (match) {
+            const ext = match[1] === "jpeg" ? "jpg" : match[1];
+            const buffer = Buffer.from(match[2], "base64");
+            const filename = `${crypto.randomUUID()}.${ext}`;
+            await writeFile(path.join(uploadsDir, filename), buffer);
+            photo = `/uploads/${filename}`;
+          }
+        }
+
+        return {
+          id: i.id as number,
+          name: i.name as string,
+          reference: i.reference as string,
+          photo,
+          description: (i.description as string) || null,
+          quantity: i.quantity as number,
+          minStock: (i.minStock as number) || null,
+          unit: i.unit as string,
+          categoryId: i.categoryId as number,
+          locationId: (i.locationId as number) || null,
+          status: i.status as string,
+          createdAt: new Date(i.createdAt as string),
+          updatedAt: new Date(i.updatedAt as string),
+        };
+      }));
+
+      await prisma.item.createMany({ data: itemsData });
     }
 
     if (movements?.length) {

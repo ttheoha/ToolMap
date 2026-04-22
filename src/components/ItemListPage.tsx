@@ -33,6 +33,8 @@ interface Props {
   title: string;
 }
 
+const ITEMS_PER_PAGE = 24;
+
 export default function ItemListPage({ reference, title }: Props) {
   const [items, setItems] = useState<Item[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -41,16 +43,26 @@ export default function ItemListPage({ reference, title }: Props) {
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState<Item | null>(null);
   const [detailId, setDetailId] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   const load = useCallback(() => {
-    const params = new URLSearchParams({ reference, status: "actif" });
+    const params = new URLSearchParams({ reference, status: "actif", page: String(page), limit: String(ITEMS_PER_PAGE) });
     if (search) params.set("search", search);
     if (filterCat) params.set("categoryId", filterCat);
-    fetch(`/api/items?${params}`).then(r => r.json()).then(setItems);
+    fetch(`/api/items?${params}`).then(r => r.json()).then(data => {
+      setItems(data.items);
+      setTotalPages(data.totalPages);
+      setTotalItems(data.total);
+    });
     fetch(`/api/categories?reference=${reference}`).then(r => r.json()).then(setCategories);
-  }, [reference, search, filterCat]);
+  }, [reference, search, filterCat, page]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Reset page when filters change
+  useEffect(() => { setPage(1); }, [search, filterCat]);
 
   const handleDelete = async (id: number) => {
     if (!confirm("Supprimer cet élément ?")) return;
@@ -114,6 +126,29 @@ export default function ItemListPage({ reference, title }: Props) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="btn-secondary text-sm disabled:opacity-40"
+          >
+            Précédent
+          </button>
+          <span className="text-sm text-garage-300">
+            Page {page}/{totalPages} ({totalItems} éléments)
+          </span>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="btn-secondary text-sm disabled:opacity-40"
+          >
+            Suivant
+          </button>
         </div>
       )}
 

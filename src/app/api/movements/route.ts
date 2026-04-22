@@ -23,6 +23,23 @@ export async function GET(request: NextRequest) {
     ];
   }
 
+  const page = sp.get("page") ? parseInt(sp.get("page")!) : null;
+  const limit = sp.get("limit") ? parseInt(sp.get("limit")!) : 50;
+
+  if (page) {
+    const [movements, total] = await Promise.all([
+      prisma.movement.findMany({
+        where,
+        include: { item: { select: { id: true, name: true, reference: true, status: true } } },
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.movement.count({ where }),
+    ]);
+    return NextResponse.json({ movements, total, page, totalPages: Math.ceil(total / limit) });
+  }
+
   const movements = await prisma.movement.findMany({
     where,
     include: { item: { select: { id: true, name: true, reference: true, status: true } } },

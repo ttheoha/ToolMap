@@ -11,6 +11,8 @@ interface Movement {
   item: { id: number; name: string; reference: string; status: string };
 }
 
+const MOVEMENTS_PER_PAGE = 50;
+
 export default function MovementLog({ reference }: { reference: string }) {
   const [showLog, setShowLog] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
@@ -20,26 +22,36 @@ export default function MovementLog({ reference }: { reference: string }) {
   const [searchHidden, setSearchHidden] = useState("");
   const [restockId, setRestockId] = useState<number | null>(null);
   const [restockQty, setRestockQty] = useState(1);
+  const [movPage, setMovPage] = useState(1);
+  const [movTotalPages, setMovTotalPages] = useState(1);
+  const [hiddenPage, setHiddenPage] = useState(1);
+  const [hiddenTotalPages, setHiddenTotalPages] = useState(1);
 
   useEffect(() => {
     if (showLog) {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams({ page: String(movPage), limit: String(MOVEMENTS_PER_PAGE) });
       if (search) params.set("search", search);
-      fetch(`/api/movements?${params}`).then(r => r.json()).then((data: Movement[]) => {
-        setMovements(data.filter(m => m.item.reference === reference));
+      fetch(`/api/movements?${params}`).then(r => r.json()).then((data: { movements: Movement[]; totalPages: number }) => {
+        setMovements(data.movements.filter(m => m.item.reference === reference));
+        setMovTotalPages(data.totalPages);
       });
     }
-  }, [showLog, search, reference]);
+  }, [showLog, search, reference, movPage]);
+
+  useEffect(() => { setMovPage(1); }, [search]);
 
   useEffect(() => {
     if (showHidden) {
-      const params = new URLSearchParams({ hidden: "true" });
+      const params = new URLSearchParams({ hidden: "true", page: String(hiddenPage), limit: String(MOVEMENTS_PER_PAGE) });
       if (searchHidden) params.set("search", searchHidden);
-      fetch(`/api/movements?${params}`).then(r => r.json()).then((data: Movement[]) => {
-        setHiddenMovements(data.filter(m => m.item.reference === reference));
+      fetch(`/api/movements?${params}`).then(r => r.json()).then((data: { movements: Movement[]; totalPages: number }) => {
+        setHiddenMovements(data.movements.filter(m => m.item.reference === reference));
+        setHiddenTotalPages(data.totalPages);
       });
     }
-  }, [showHidden, searchHidden, reference]);
+  }, [showHidden, searchHidden, reference, hiddenPage]);
+
+  useEffect(() => { setHiddenPage(1); }, [searchHidden]);
 
   const handleRestock = async (itemId: number) => {
     if (restockQty < 1) return;
@@ -51,10 +63,11 @@ export default function MovementLog({ reference }: { reference: string }) {
     setRestockId(null);
     setRestockQty(1);
     // Refresh hidden movements
-    const params = new URLSearchParams({ hidden: "true" });
+    const params = new URLSearchParams({ hidden: "true", page: String(hiddenPage), limit: String(MOVEMENTS_PER_PAGE) });
     if (searchHidden) params.set("search", searchHidden);
-    const data: Movement[] = await fetch(`/api/movements?${params}`).then(r => r.json());
-    setHiddenMovements(data.filter(m => m.item.reference === reference));
+    const data: { movements: Movement[]; totalPages: number } = await fetch(`/api/movements?${params}`).then(r => r.json());
+    setHiddenMovements(data.movements.filter(m => m.item.reference === reference));
+    setHiddenTotalPages(data.totalPages);
   };
 
   const renderMovements = (list: Movement[], isHidden = false) => (
@@ -135,6 +148,13 @@ export default function MovementLog({ reference }: { reference: string }) {
           </button>
         </div>
         {renderMovements(movements)}
+        {movTotalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-4">
+            <button onClick={() => setMovPage(p => Math.max(1, p - 1))} disabled={movPage === 1} className="btn-secondary text-sm disabled:opacity-40">Précédent</button>
+            <span className="text-sm text-garage-300">Page {movPage}/{movTotalPages}</span>
+            <button onClick={() => setMovPage(p => Math.min(movTotalPages, p + 1))} disabled={movPage === movTotalPages} className="btn-secondary text-sm disabled:opacity-40">Suivant</button>
+          </div>
+        )}
       </Modal>
 
       <Modal isOpen={showHidden} onClose={() => setShowHidden(false)} title="Historique masqué (Vendu / Vide)" size="xl">
@@ -145,6 +165,13 @@ export default function MovementLog({ reference }: { reference: string }) {
           </button>
         </div>
         {renderMovements(hiddenMovements, true)}
+        {hiddenTotalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-4">
+            <button onClick={() => setHiddenPage(p => Math.max(1, p - 1))} disabled={hiddenPage === 1} className="btn-secondary text-sm disabled:opacity-40">Précédent</button>
+            <span className="text-sm text-garage-300">Page {hiddenPage}/{hiddenTotalPages}</span>
+            <button onClick={() => setHiddenPage(p => Math.min(hiddenTotalPages, p + 1))} disabled={hiddenPage === hiddenTotalPages} className="btn-secondary text-sm disabled:opacity-40">Suivant</button>
+          </div>
+        )}
       </Modal>
     </>
   );

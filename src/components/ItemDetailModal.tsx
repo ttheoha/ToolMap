@@ -133,14 +133,33 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !item) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("La photo ne doit pas dépasser 2 Mo");
+      return;
+    }
     setSavingPhoto(true);
     const reader = new FileReader();
     reader.onload = async () => {
-      const photo = reader.result as string;
+      const base64 = reader.result as string;
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photo: base64 }),
+      });
+      if (!uploadRes.ok) {
+        alert("Erreur lors de l'upload de la photo");
+        setSavingPhoto(false);
+        return;
+      }
+      const { path } = await uploadRes.json();
+      // Delete old photo file if it was a file path
+      if (item.photo && item.photo.startsWith("/uploads/")) {
+        await fetch("/api/upload", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: item.photo }) });
+      }
       await fetch(`/api/items/${item.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ photo }),
+        body: JSON.stringify({ photo: path }),
       });
       const updated = await fetch(`/api/items/${item.id}`).then(r => r.json());
       setItem(updated);
@@ -154,6 +173,10 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
   const handlePhotoDelete = async () => {
     if (!item || !confirm("Supprimer la photo ?")) return;
     setSavingPhoto(true);
+    // Delete photo file if it was a file path
+    if (item.photo && item.photo.startsWith("/uploads/")) {
+      await fetch("/api/upload", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: item.photo }) });
+    }
     await fetch(`/api/items/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
