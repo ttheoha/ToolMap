@@ -74,8 +74,8 @@ model Item {
 
 model Movement {
   id          Int      @id @default(autoincrement())
-  itemId      Int
-  item        Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId      Int?
+  item        Item?    @relation(fields: [itemId], references: [id], onDelete: SetNull)
   type        String   @db.VarChar(30) // Ajout, Modif, Suppression, Pret, Rendu, Vendu, Vide
   description String?  @db.Text
   createdAt   DateTime @default(now())

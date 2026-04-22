@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
     if (movements?.length) {
       await prisma.movement.createMany({ data: movements.map((m: Record<string, unknown>) => ({
         id: m.id as number,
-        itemId: m.itemId as number,
+        itemId: m.itemId != null ? (m.itemId as number) : null,
         type: m.type as string,
         description: (m.description as string) || null,
         createdAt: new Date(m.createdAt as string),

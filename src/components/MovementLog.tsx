@@ -8,7 +8,7 @@ interface Movement {
   type: string;
   description: string | null;
   createdAt: string;
-  item: { id: number; name: string; reference: string; status: string };
+  item: { id: number; name: string; reference: string; status: string } | null;
 }
 
 const MOVEMENTS_PER_PAGE = 50;
@@ -32,7 +32,9 @@ export default function MovementLog({ reference }: { reference: string }) {
       const params = new URLSearchParams({ page: String(movPage), limit: String(MOVEMENTS_PER_PAGE) });
       if (search) params.set("search", search);
       fetch(`/api/movements?${params}`).then(r => r.json()).then((data: { movements: Movement[]; totalPages: number }) => {
-        setMovements(data.movements.filter(m => m.item.reference === reference));
+        setMovements(data.movements.filter(m =>
+          m.item ? m.item.reference === reference : (m.description?.includes(reference) ?? false)
+        ));
         setMovTotalPages(data.totalPages);
       });
     }
@@ -45,7 +47,9 @@ export default function MovementLog({ reference }: { reference: string }) {
       const params = new URLSearchParams({ hidden: "true", page: String(hiddenPage), limit: String(MOVEMENTS_PER_PAGE) });
       if (searchHidden) params.set("search", searchHidden);
       fetch(`/api/movements?${params}`).then(r => r.json()).then((data: { movements: Movement[]; totalPages: number }) => {
-        setHiddenMovements(data.movements.filter(m => m.item.reference === reference));
+        setHiddenMovements(data.movements.filter(m =>
+          m.item ? m.item.reference === reference : (m.description?.includes(reference) ?? false)
+        ));
         setHiddenTotalPages(data.totalPages);
       });
     }
@@ -66,7 +70,9 @@ export default function MovementLog({ reference }: { reference: string }) {
     const params = new URLSearchParams({ hidden: "true", page: String(hiddenPage), limit: String(MOVEMENTS_PER_PAGE) });
     if (searchHidden) params.set("search", searchHidden);
     const data: { movements: Movement[]; totalPages: number } = await fetch(`/api/movements?${params}`).then(r => r.json());
-    setHiddenMovements(data.movements.filter(m => m.item.reference === reference));
+    setHiddenMovements(data.movements.filter(m =>
+      m.item ? m.item.reference === reference : (m.description?.includes(reference) ?? false)
+    ));
     setHiddenTotalPages(data.totalPages);
   };
 
@@ -79,7 +85,7 @@ export default function MovementLog({ reference }: { reference: string }) {
           <div key={m.id} className="bg-garage-700/50 rounded px-3 py-2">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm">
               <span className="text-garage-500 text-xs shrink-0 w-full sm:w-32">{new Date(m.createdAt).toLocaleString("fr-FR")}</span>
-              <span className="font-medium text-garage-200 shrink-0 sm:w-32 truncate">{m.item.name}</span>
+              <span className="font-medium text-garage-200 shrink-0 sm:w-32 truncate">{m.item?.name ?? "—"}</span>
               <span className={`px-1.5 py-0.5 rounded text-xs font-medium shrink-0 ${
                 m.type === "Ajout" ? "bg-green-900 text-green-300" :
                 m.type === "Suppression" ? "bg-red-900 text-red-300" :
@@ -90,16 +96,16 @@ export default function MovementLog({ reference }: { reference: string }) {
                 "bg-garage-600 text-garage-200"
               }`}>{m.type}</span>
               <span className="text-garage-400 truncate flex-1">{m.description}</span>
-              {isHidden && m.type === "Vide" && m.item.status === "vide" && (
+              {isHidden && m.item && m.type === "Vide" && m.item.status === "vide" && (
                 <button
-                  onClick={() => { setRestockId(restockId === m.item.id ? null : m.item.id); setRestockQty(1); }}
+                  onClick={() => { setRestockId(restockId === m.item!.id ? null : m.item!.id); setRestockQty(1); }}
                   className="btn-primary text-xs py-1 px-2 shrink-0"
                 >
                   Réapprovisionné
                 </button>
               )}
             </div>
-            {isHidden && restockId === m.item.id && m.type === "Vide" && m.item.status === "vide" && (
+            {isHidden && m.item && restockId === m.item.id && m.type === "Vide" && m.item.status === "vide" && (
               <div className="flex flex-wrap items-center gap-2 mt-2 sm:ml-32 pl-3">
                 <label className="text-xs text-garage-400">Quantité :</label>
                 <input
