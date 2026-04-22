@@ -158,6 +158,19 @@ export default function GridPlan() {
     }
   };
 
+  const handleRemoveItem = async (itemId: number) => {
+    if (!confirm("Retirer cet élément du casier ?")) return;
+    await fetch(`/api/items/${itemId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ locationId: null }),
+    });
+    if (selectedCell && cellLocationId) {
+      handleCellClick(selectedCell.ligne, selectedCell.colonne, cellLocationId);
+    }
+    loadGrids();
+  };
+
   const loadUnassignedItems = async (search?: string) => {
     const params = new URLSearchParams({ locationId: "none", status: "actif" });
     if (search) params.set("search", search);
@@ -412,10 +425,17 @@ export default function GridPlan() {
                 {cellItems.map(item => (
                   <div key={item.id} className="flex items-center gap-3 bg-garage-700 rounded-lg px-3 py-2">
                     <ImageZoom src={item.photo || ""} alt={item.name} />
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm">{item.name}</h4>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-sm truncate">{item.name}</h4>
                       <p className="text-xs text-garage-400">{item.category.name} — {item.quantity} {item.unit}</p>
                     </div>
+                    <button
+                      onClick={() => handleRemoveItem(item.id)}
+                      className="text-xs text-garage-400 hover:text-red-400 transition-colors shrink-0"
+                      title="Retirer du casier"
+                    >
+                      Retirer
+                    </button>
                   </div>
                 ))}
               </div>
