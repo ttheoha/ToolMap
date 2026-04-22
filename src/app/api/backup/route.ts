@@ -122,6 +122,22 @@ export async function POST(request: NextRequest) {
       const uploadsDir = path.join(process.cwd(), "public", "uploads");
       await mkdir(uploadsDir, { recursive: true });
 
+      // Helper to write base64 image to disk
+      const saveBase64ToDisk = async (base64: string): Promise<string | null> => {
+        try {
+          const match = base64.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/s);
+          if (!match) return null;
+          const ext = match[1] === "jpeg" ? "jpg" : match[1].replace("+", "");
+          const buffer = Buffer.from(match[2], "base64");
+          if (buffer.length < 100) return null; // Skip truncated/corrupt data
+          const filename = `${crypto.randomUUID()}.${ext}`;
+          await writeFile(path.join(uploadsDir, filename), buffer);
+          return `/uploads/${filename}`;
+        } catch {
+          return null;
+        }
+      };
+
       // Restore photos from base64 to filesystem
       const itemsData = await Promise.all(items.map(async (i: Record<string, unknown>) => {
         let photo = (i.photo as string) || null;
@@ -129,24 +145,13 @@ export async function POST(request: NextRequest) {
 
         if (photoBase64) {
           // Backup contains embedded base64 photo — write it to disk
-          const match = photoBase64.match(/^data:image\/(\w+);base64,(.+)$/);
-          if (match) {
-            const ext = match[1] === "jpeg" ? "jpg" : match[1];
-            const buffer = Buffer.from(match[2], "base64");
-            const filename = `${crypto.randomUUID()}.${ext}`;
-            await writeFile(path.join(uploadsDir, filename), buffer);
-            photo = `/uploads/${filename}`;
-          }
+          const saved = await saveBase64ToDisk(photoBase64);
+          if (saved) photo = saved;
         } else if (photo && photo.startsWith("data:image/")) {
           // Legacy backup with base64 directly in photo field — write to disk
-          const match = photo.match(/^data:image\/(\w+);base64,(.+)$/);
-          if (match) {
-            const ext = match[1] === "jpeg" ? "jpg" : match[1];
-            const buffer = Buffer.from(match[2], "base64");
-            const filename = `${crypto.randomUUID()}.${ext}`;
-            await writeFile(path.join(uploadsDir, filename), buffer);
-            photo = `/uploads/${filename}`;
-          }
+          const saved = await saveBase64ToDisk(photo);
+          if (saved) photo = saved;
+          else photo = null; // Truncated/corrupt — discard
         }
 
         return {
@@ -156,10 +161,10 @@ export async function POST(request: NextRequest) {
           photo,
           description: (i.description as string) || null,
           quantity: i.quantity as number,
-          minStock: (i.minStock as number) || null,
+          minStock: i.minStock != null ? Number(i.minStock) : null,
           unit: i.unit as string,
           categoryId: i.categoryId as number,
-          locationId: (i.locationId as number) || null,
+          locationId: i.locationId != null ? Number(i.locationId) : null,
           status: i.status as string,
           createdAt: new Date(i.createdAt as string),
           updatedAt: new Date(i.updatedAt as string),

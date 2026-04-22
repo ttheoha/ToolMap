@@ -7,8 +7,9 @@ interface LowStockItem {
   id: number;
   name: string;
   quantity: number;
-  minStock: number;
+  minStock: number | null;
   unit: string;
+  status: string;
   category: string;
   location: string | null;
 }
@@ -72,7 +73,7 @@ export default function DashboardPage() {
         <div className="card border-red-700/50">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-red-400 text-lg">&#9888;</span>
-            <h2 className="text-lg font-semibold text-red-400">Consommables en stock bas</h2>
+            <h2 className="text-lg font-semibold text-red-400">Consommables en stock bas / vides</h2>
             <span className="text-xs bg-red-900 text-red-300 px-2 py-0.5 rounded-full font-medium">
               {data.lowStockConsommables.length}
             </span>
@@ -93,10 +94,11 @@ export default function DashboardPage() {
                   <tr key={item.id} className="border-b border-garage-700/50 hover:bg-garage-700/30">
                     <td className="py-2 px-3 font-medium text-garage-100">{item.name}</td>
                     <td className="py-2 px-3 text-garage-200">{item.category}</td>
-                    <td className={`py-2 px-3 text-right font-semibold ${item.quantity === 0 ? "text-red-400" : "text-yellow-400"}`}>
+                    <td className={`py-2 px-3 text-right font-semibold ${item.quantity === 0 || item.status === "vide" ? "text-red-400" : "text-yellow-400"}`}>
                       {item.quantity} {item.unit}
+                      {item.status === "vide" && <span className="ml-1 text-xs bg-red-900 text-red-300 px-1 py-0.5 rounded">vide</span>}
                     </td>
-                    <td className="py-2 px-3 text-right text-garage-200">{item.minStock} {item.unit}</td>
+                    <td className="py-2 px-3 text-right text-garage-200">{item.minStock != null ? `${item.minStock} ${item.unit}` : "—"}</td>
                     <td className="py-2 px-3 text-garage-200">{item.location || "—"}</td>
                   </tr>
                 ))}

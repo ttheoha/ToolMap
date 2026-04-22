@@ -51,7 +51,7 @@ model Item {
   id          Int        @id @default(autoincrement())
   name        String     @db.VarChar(200)
   reference   String     @db.VarChar(50) // Outils, Materiels, Consommables
-  photo       String?    @db.VarChar(500) // Path to uploaded photo file
+  photo       String?    @db.Text         // File path (/uploads/...) or legacy base64
   description String?    @db.Text
   quantity    Int        @default(1)
   minStock    Int?       // Seuil de stock minimum (consommables uniquement)
