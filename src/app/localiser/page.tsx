@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useDebounce } from "@/hooks/useDebounce";
 import ImageZoom from "@/components/ImageZoom";
@@ -23,7 +23,7 @@ interface LocatedItem {
   } | null;
 }
 
-export default function LocaliserPage() {
+function LocaliserContent() {
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") || "");
   const debouncedSearch = useDebounce(search, 300);
@@ -45,9 +45,7 @@ export default function LocaliserPage() {
   }, [debouncedSearch]);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-xl md:text-2xl font-bold text-accent">Localiser un outil</h1>
-
+    <>
       <div className="card">
         <input
           value={search}
@@ -98,6 +96,17 @@ export default function LocaliserPage() {
           ))}
         </div>
       )}
+    </>
+  );
+}
+
+export default function LocaliserPage() {
+  return (
+    <div className="space-y-6">
+      <h1 className="text-xl md:text-2xl font-bold text-accent">Localiser un outil</h1>
+      <Suspense fallback={<div className="text-garage-400 text-center py-8">Chargement...</div>}>
+        <LocaliserContent />
+      </Suspense>
     </div>
   );
 }

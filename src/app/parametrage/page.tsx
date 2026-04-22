@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import CategoriesManager from "@/components/CategoriesManager";
 import GridPlan from "@/components/GridPlan";
@@ -9,7 +9,7 @@ import BackupRestore from "@/components/BackupRestore";
 import ImportCSV from "@/components/ImportCSV";
 import ThemeToggle from "@/components/ThemeToggle";
 
-export default function ParametragePage() {
+function ParametrageContent() {
   const searchParams = useSearchParams();
   const [tab, setTab] = useState<"plan" | "lieux" | "categories" | "backup">("plan");
   const initialLieu = searchParams.get("lieu") || undefined;
@@ -20,7 +20,7 @@ export default function ParametragePage() {
   }, [initialLieu]);
 
   return (
-    <div className="space-y-6">
+    <>
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-xl md:text-2xl font-bold text-accent">Paramétrage</h1>
       </div>
@@ -71,6 +71,16 @@ export default function ParametragePage() {
           <ImportCSV />
         </div>
       )}
+    </>
+  );
+}
+
+export default function ParametragePage() {
+  return (
+    <div className="space-y-6">
+      <Suspense fallback={<div className="text-garage-400 text-center py-8">Chargement...</div>}>
+        <ParametrageContent />
+      </Suspense>
     </div>
   );
 }
