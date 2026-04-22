@@ -153,7 +153,7 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
       }
       const { path } = await uploadRes.json();
       // Delete old photo file if it was a file path
-      if (item.photo && item.photo.startsWith("/uploads/")) {
+      if (item.photo && item.photo.includes("/uploads/")) {
         await fetch("/api/upload", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: item.photo }) });
       }
       await fetch(`/api/items/${item.id}`, {
@@ -174,7 +174,7 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
     if (!item || !confirm("Supprimer la photo ?")) return;
     setSavingPhoto(true);
     // Delete photo file if it was a file path
-    if (item.photo && item.photo.startsWith("/uploads/")) {
+    if (item.photo && item.photo.includes("/uploads/")) {
       await fetch("/api/upload", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: item.photo }) });
     }
     await fetch(`/api/items/${item.id}`, {

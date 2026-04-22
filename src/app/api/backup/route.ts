@@ -27,15 +27,19 @@ export async function GET() {
   // Embed photo files as base64 in backup
   const itemsWithPhotos = await Promise.all(
     items.map(async (item) => {
-      if (item.photo && item.photo.startsWith("/uploads/")) {
-        try {
-          const filePath = path.join(process.cwd(), "public", item.photo);
-          const buffer = await readFile(filePath);
-          const ext = path.extname(item.photo).slice(1);
-          const mime = ext === "jpg" ? "jpeg" : ext;
-          return { ...item, _photoBase64: `data:image/${mime};base64,${buffer.toString("base64")}` };
-        } catch {
-          return item;
+      if (item.photo) {
+        // Extract filename from /api/uploads/xxx or /uploads/xxx
+        const fnMatch = item.photo.match(/\/(?:api\/)?uploads\/([^/]+)$/);
+        if (fnMatch) {
+          try {
+            const filePath = path.join(process.cwd(), "public", "uploads", fnMatch[1]);
+            const buffer = await readFile(filePath);
+            const ext = path.extname(fnMatch[1]).slice(1);
+            const mime = ext === "jpg" ? "jpeg" : ext;
+            return { ...item, _photoBase64: `data:image/${mime};base64,${buffer.toString("base64")}` };
+          } catch {
+            return item;
+          }
         }
       }
       return item;
@@ -132,7 +136,7 @@ export async function POST(request: NextRequest) {
           if (buffer.length < 100) return null; // Skip truncated/corrupt data
           const filename = `${crypto.randomUUID()}.${ext}`;
           await writeFile(path.join(uploadsDir, filename), buffer);
-          return `/uploads/${filename}`;
+          return `/api/uploads/${filename}`;
         } catch {
           return null;
         }

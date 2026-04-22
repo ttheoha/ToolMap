@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     const filename = `${crypto.randomUUID()}.${ext}`;
     await writeFile(path.join(UPLOADS_DIR, filename), buffer);
 
-    return NextResponse.json({ path: `/uploads/${filename}` });
+    return NextResponse.json({ path: `/api/uploads/${filename}` });
   } catch (err) {
     console.error("Upload error:", err);
     return NextResponse.json({ error: "Erreur lors de l'upload" }, { status: 500 });
@@ -41,11 +41,17 @@ export async function DELETE(request: NextRequest) {
   try {
     const { path: filePath } = await request.json();
 
-    if (!filePath || typeof filePath !== "string" || !filePath.startsWith("/uploads/")) {
+    if (!filePath || typeof filePath !== "string") {
       return NextResponse.json({ error: "Chemin invalide" }, { status: 400 });
     }
 
-    const fullPath = path.join(process.cwd(), "public", filePath);
+    // Extract filename from /api/uploads/xxx or /uploads/xxx
+    const match = filePath.match(/\/(?:api\/)?uploads\/([^/]+)$/);
+    if (!match) {
+      return NextResponse.json({ error: "Chemin invalide" }, { status: 400 });
+    }
+
+    const fullPath = path.join(process.cwd(), "public", "uploads", match[1]);
     await unlink(fullPath).catch(() => {});
 
     return NextResponse.json({ success: true });
