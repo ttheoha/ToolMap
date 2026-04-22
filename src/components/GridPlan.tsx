@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import Modal from "./Modal";
 import ItemForm from "./ItemForm";
 import ImageZoom from "./ImageZoom";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface LieuType {
   id: number;
@@ -36,10 +37,15 @@ interface ItemInLocation {
   category: { name: string };
 }
 
-export default function GridPlan() {
+interface GridPlanProps {
+  initialLieu?: string;
+  initialEmplacement?: string;
+}
+
+export default function GridPlan({ initialLieu, initialEmplacement }: GridPlanProps = {}) {
   const [lieuxList, setLieuxList] = useState<LieuType[]>([]);
-  const [lieu, setLieu] = useState("");
-  const [emplacement, setEmplacement] = useState("E0");
+  const [lieu, setLieu] = useState(initialLieu || "");
+  const [emplacement, setEmplacement] = useState(initialEmplacement || "E0");
   const [rows, setRows] = useState(5);
   const [cols, setCols] = useState(5);
   const [grids, setGrids] = useState<GridConfig[]>([]);
@@ -52,6 +58,7 @@ export default function GridPlan() {
   const [cellLocationId, setCellLocationId] = useState<number | null>(null);
   const [showAddItem, setShowAddItem] = useState(false);
   const [showAssignExisting, setShowAssignExisting] = useState(false);
+  const [showQR, setShowQR] = useState(false);
   const [unassignedItems, setUnassignedItems] = useState<ItemInLocation[]>([]);
   const [assignSearch, setAssignSearch] = useState("");
   const [assigningId, setAssigningId] = useState<number | null>(null);
@@ -61,12 +68,13 @@ export default function GridPlan() {
   const [gridSearch, setGridSearch] = useState("");
   const [highlightedLocationId, setHighlightedLocationId] = useState<number | null>(null);
   const [searchResults, setSearchResults] = useState<{ id: number; name: string; locationId: number; emplacement: string; ligne: string; colonne: number }[]>([]);
+  const debouncedGridSearch = useDebounce(gridSearch, 300);
 
   // Load lieux list
   useEffect(() => {
     fetch("/api/lieux").then(r => r.json()).then((data: LieuType[]) => {
       setLieuxList(data);
-      if (data.length > 0 && !lieu) setLieu(data[0].name);
+      if (data.length > 0 && !lieu) setLieu(initialLieu || data[0].name);
     });
   }, [lieu]);
 
@@ -78,26 +86,28 @@ export default function GridPlan() {
 
   useEffect(() => { loadGrids(); }, [loadGrids]);
 
-  const handleGridSearch = async (query: string) => {
-    setGridSearch(query);
+  useEffect(() => {
     setHighlightedLocationId(null);
-    if (!query.trim() || !lieu) {
+    if (!debouncedGridSearch.trim() || !lieu) {
       setSearchResults([]);
       return;
     }
-    const items = await fetch(`/api/items?search=${encodeURIComponent(query)}&status=actif`).then(r => r.json());
-    const results = items
-      .filter((i: { location: { lieu: string; emplacement: string; ligne: string; colonne: number } | null }) => i.location && i.location.lieu === lieu)
-      .map((i: { id: number; name: string; locationId: number; location: { emplacement: string; ligne: string; colonne: number } }) => ({
-        id: i.id,
-        name: i.name,
-        locationId: i.locationId,
-        emplacement: i.location.emplacement,
-        ligne: i.location.ligne,
-        colonne: i.location.colonne,
-      }));
-    setSearchResults(results);
-  };
+    fetch(`/api/items?search=${encodeURIComponent(debouncedGridSearch)}&status=actif`)
+      .then(r => r.json())
+      .then(items => {
+        const results = items
+          .filter((i: { location: { lieu: string } | null }) => i.location && i.location.lieu === lieu)
+          .map((i: { id: number; name: string; locationId: number; location: { emplacement: string; ligne: string; colonne: number } }) => ({
+            id: i.id,
+            name: i.name,
+            locationId: i.locationId,
+            emplacement: i.location.emplacement,
+            ligne: i.location.ligne,
+            colonne: i.location.colonne,
+          }));
+        setSearchResults(results);
+      });
+  }, [debouncedGridSearch, lieu]);
 
   const handleSelectSearchResult = (result: typeof searchResults[0]) => {
     setEmplacement(result.emplacement);
@@ -201,6 +211,7 @@ export default function GridPlan() {
     setCellLocationId(null);
     setShowAddItem(false);
     setShowAssignExisting(false);
+    setShowQR(false);
     setAssignSearch("");
   };
 
@@ -302,7 +313,7 @@ export default function GridPlan() {
           <div className="relative">
             <input
               value={gridSearch}
-              onChange={e => handleGridSearch(e.target.value)}
+              onChange={e => setGridSearch(e.target.value)}
               placeholder="Rechercher un élément sur le plan..."
               className="input-field w-full"
             />
@@ -405,9 +416,14 @@ export default function GridPlan() {
         {selectedCell && (
           <div className="space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
-              <h3 className="text-sm text-garage-400">
-                Contenu du casier {selectedCell.emplacement}-{selectedCell.ligne}{selectedCell.colonne}
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm text-garage-400">
+                  Contenu du casier {selectedCell.emplacement}-{selectedCell.ligne}{selectedCell.colonne}
+                </h3>
+                <button onClick={() => setShowQR(!showQR)} className="text-xs text-garage-400 hover:text-accent transition-colors" title="QR Code">
+                  QR
+                </button>
+              </div>
               <div className="flex gap-2">
                 <button onClick={() => { setShowAssignExisting(true); setShowAddItem(false); loadUnassignedItems(); }} className="btn-secondary text-sm">
                   + Élément existant
@@ -417,6 +433,17 @@ export default function GridPlan() {
                 </button>
               </div>
             </div>
+
+            {showQR && (
+              <div className="flex flex-col items-center gap-2 py-2">
+                <img
+                  src={`/api/qrcode?text=${encodeURIComponent(`${typeof window !== "undefined" ? window.location.origin : ""}/localiser?q=${selectedCell.emplacement}-${selectedCell.ligne}${selectedCell.colonne}`)}&size=200`}
+                  alt="QR Code"
+                  className="w-48 h-48 bg-white p-2 rounded-lg"
+                />
+                <p className="text-xs text-garage-400">Scannez pour voir le contenu du casier</p>
+              </div>
+            )}
 
             {cellItems.length === 0 ? (
               <p className="text-garage-500 text-center py-6">Casier vide</p>

@@ -1,14 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import CategoriesManager from "@/components/CategoriesManager";
 import GridPlan from "@/components/GridPlan";
 import LocationsManager from "@/components/LocationsManager";
 import BackupRestore from "@/components/BackupRestore";
+import ImportCSV from "@/components/ImportCSV";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export default function ParametragePage() {
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState<"plan" | "lieux" | "categories" | "backup">("plan");
+  const initialLieu = searchParams.get("lieu") || undefined;
+  const initialEmplacement = searchParams.get("emplacement") || undefined;
+
+  useEffect(() => {
+    if (initialLieu) setTab("plan");
+  }, [initialLieu]);
 
   return (
     <div className="space-y-6">
@@ -53,10 +62,15 @@ export default function ParametragePage() {
         </button>
       </div>
 
-      {tab === "plan" && <GridPlan />}
+      {tab === "plan" && <GridPlan initialLieu={initialLieu} initialEmplacement={initialEmplacement} />}
       {tab === "lieux" && <LocationsManager />}
       {tab === "categories" && <CategoriesManager />}
-      {tab === "backup" && <BackupRestore />}
+      {tab === "backup" && (
+        <div className="space-y-6">
+          <BackupRestore />
+          <ImportCSV />
+        </div>
+      )}
     </div>
   );
 }

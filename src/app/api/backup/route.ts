@@ -67,8 +67,22 @@ export async function POST(request: NextRequest) {
   try {
     const backup = await request.json();
 
-    if (!backup.data) {
-      return NextResponse.json({ error: "Format de sauvegarde invalide" }, { status: 400 });
+    if (!backup.data || typeof backup.data !== "object") {
+      return NextResponse.json({ error: "Format de sauvegarde invalide : champ 'data' manquant" }, { status: 400 });
+    }
+
+    const requiredKeys = ["categories", "items"];
+    const missingKeys = requiredKeys.filter(k => !Array.isArray(backup.data[k]));
+    if (missingKeys.length > 0) {
+      return NextResponse.json({ error: `Format de sauvegarde invalide : clés manquantes (${missingKeys.join(", ")})` }, { status: 400 });
+    }
+
+    // Validate items structure (spot check first item)
+    if (backup.data.items.length > 0) {
+      const sample = backup.data.items[0];
+      if (!sample.name || !sample.reference || sample.categoryId === undefined) {
+        return NextResponse.json({ error: "Format de sauvegarde invalide : structure des items incorrecte" }, { status: 400 });
+      }
     }
 
     const { categories, lieux, locations, gridConfigs, items, movements, loans } = backup.data;

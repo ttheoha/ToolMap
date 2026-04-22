@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+let cache: { data: unknown; timestamp: number } | null = null;
+const CACHE_TTL = 10_000; // 10 seconds
+
 export async function GET() {
+  if (cache && Date.now() - cache.timestamp < CACHE_TTL) {
+    return NextResponse.json(cache.data);
+  }
   // Top 5 outils les plus utilisés (par nombre de mouvements)
   const topOutils = await prisma.item.findMany({
     where: { reference: "Outils", status: "actif" },
@@ -64,11 +70,14 @@ export async function GET() {
   const totalMateriels = await prisma.item.count({ where: { reference: "Materiels", status: "actif" } });
   const totalConsommables = await prisma.item.count({ where: { reference: "Consommables", status: "actif" } });
 
-  return NextResponse.json({
+  const result = {
     topOutils: topOutils.map((i) => ({ name: i.name, value: i._count.history })),
     topConsommables: topConsommables.map((i) => ({ name: i.name, value: i._count.history })),
     activeLoans,
     lowStockConsommables,
     stats: { totalItems, totalOutils, totalMateriels, totalConsommables },
-  });
+  };
+
+  cache = { data: result, timestamp: Date.now() };
+  return NextResponse.json(result);
 }
