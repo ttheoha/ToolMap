@@ -454,7 +454,7 @@ export default function GridPlan({ initialLieu, initialEmplacement, initialLigne
             {showQR && (
               <div className="flex flex-col items-center gap-2 py-2">
                 <img
-                  src={`/api/qrcode?text=${encodeURIComponent(`${typeof window !== "undefined" ? window.location.origin : ""}/localiser?q=${selectedCell.emplacement}-${selectedCell.ligne}${selectedCell.colonne}`)}&size=200`}
+                  src={`/api/qrcode?text=${encodeURIComponent(`${typeof window !== "undefined" ? window.location.origin : ""}/parametrage?lieu=${encodeURIComponent(selectedCell.lieu)}&emplacement=${selectedCell.emplacement}&ligne=${selectedCell.ligne}&colonne=${selectedCell.colonne}`)}&size=200`}
                   alt="QR Code"
                   className="w-48 h-48 bg-white p-2 rounded-lg"
                 />
