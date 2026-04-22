@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Modal from "./Modal";
 import ImageZoom from "./ImageZoom";
 
@@ -27,6 +28,7 @@ interface Props {
 }
 
 export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
+  const router = useRouter();
   const [item, setItem] = useState<ItemDetail | null>(null);
   const [loanForm, setLoanForm] = useState(false);
   const [firstName, setFirstName] = useState("");
@@ -232,7 +234,26 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
             <p className="text-garage-300 text-sm">{item.description || "Aucune description"}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
               <div><span className="text-garage-400">Quantité:</span> {item.quantity} {item.unit}</div>
-              <div><span className="text-garage-400">Emplacement:</span> {item.location ? `${item.location.lieu} - ${item.location.emplacement}-${item.location.ligne}${item.location.colonne}` : "Non assigné"}</div>
+              <div className="flex items-center gap-2">
+                <span className="text-garage-400">Emplacement:</span>
+                {item.location ? (
+                  <>
+                    <span>{item.location.lieu} - {item.location.emplacement}-{item.location.ligne}{item.location.colonne}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        router.push(`/parametrage?lieu=${encodeURIComponent(item.location!.lieu)}&emplacement=${item.location!.emplacement}&ligne=${item.location!.ligne}&colonne=${item.location!.colonne}`);
+                      }}
+                      className="text-xs text-accent hover:text-accent/80 transition-colors font-medium"
+                    >
+                      Localiser
+                    </button>
+                  </>
+                ) : (
+                  <span>Non assigné</span>
+                )}
+              </div>
             </div>
           </div>
         </div>

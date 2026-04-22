@@ -9,7 +9,6 @@ const navItems = [
   { href: "/outils", label: "Outils", icon: "🔧" },
   { href: "/materiels", label: "Matériels", icon: "⚙️" },
   { href: "/consommables", label: "Consommables", icon: "📦" },
-  { href: "/localiser", label: "Localiser", icon: "📍" },
   { href: "/parametrage", label: "Paramétrage", icon: "⚡" },
 ];
 
