@@ -12,6 +12,7 @@ export default function ImageZoom({ src, alt }: { src: string; alt: string }) {
       <img
         src={src}
         alt={alt}
+        loading="lazy"
         className="w-16 h-16 object-cover rounded cursor-pointer border border-garage-600 hover:border-accent transition-colors"
         onClick={() => setZoomed(true)}
       />

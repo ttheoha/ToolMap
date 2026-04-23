@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import Modal from "./Modal";
 import ItemForm from "./ItemForm";
 import ImageZoom from "./ImageZoom";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface LieuType {
   id: number;
@@ -36,10 +37,17 @@ interface ItemInLocation {
   category: { name: string };
 }
 
-export default function GridPlan() {
+interface GridPlanProps {
+  initialLieu?: string;
+  initialEmplacement?: string;
+  initialLigne?: string;
+  initialColonne?: number;
+}
+
+export default function GridPlan({ initialLieu, initialEmplacement, initialLigne, initialColonne }: GridPlanProps = {}) {
   const [lieuxList, setLieuxList] = useState<LieuType[]>([]);
-  const [lieu, setLieu] = useState("");
-  const [emplacement, setEmplacement] = useState("E0");
+  const [lieu, setLieu] = useState(initialLieu || "");
+  const [emplacement, setEmplacement] = useState(initialEmplacement || "E0");
   const [rows, setRows] = useState(5);
   const [cols, setCols] = useState(5);
   const [grids, setGrids] = useState<GridConfig[]>([]);
@@ -51,12 +59,27 @@ export default function GridPlan() {
   const [cellItems, setCellItems] = useState<ItemInLocation[]>([]);
   const [cellLocationId, setCellLocationId] = useState<number | null>(null);
   const [showAddItem, setShowAddItem] = useState(false);
+  const [showAssignExisting, setShowAssignExisting] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+  const [unassignedItems, setUnassignedItems] = useState<ItemInLocation[]>([]);
+  const [assignSearch, setAssignSearch] = useState("");
+  const [assigningId, setAssigningId] = useState<number | null>(null);
+  const [addItemReference, setAddItemReference] = useState("Outils");
+
+  // Animate target cell from query params
+  const [animatingCell, setAnimatingCell] = useState<{ ligne: string; colonne: number } | null>(null);
+
+  // Search item on grid
+  const [gridSearch, setGridSearch] = useState("");
+  const [highlightedLocationId, setHighlightedLocationId] = useState<number | null>(null);
+  const [searchResults, setSearchResults] = useState<{ id: number; name: string; locationId: number; emplacement: string; ligne: string; colonne: number }[]>([]);
+  const debouncedGridSearch = useDebounce(gridSearch, 300);
 
   // Load lieux list
   useEffect(() => {
     fetch("/api/lieux").then(r => r.json()).then((data: LieuType[]) => {
       setLieuxList(data);
-      if (data.length > 0 && !lieu) setLieu(data[0].name);
+      if (data.length > 0 && !lieu) setLieu(initialLieu || data[0].name);
     });
   }, [lieu]);
 
@@ -67,6 +90,43 @@ export default function GridPlan() {
   }, [lieu]);
 
   useEffect(() => { loadGrids(); }, [loadGrids]);
+
+  // Trigger animation when navigating from localiser
+  useEffect(() => {
+    if (initialLigne && initialColonne && grids.length > 0) {
+      setAnimatingCell({ ligne: initialLigne, colonne: initialColonne });
+      const timer = setTimeout(() => setAnimatingCell(null), 2400);
+      return () => clearTimeout(timer);
+    }
+  }, [initialLigne, initialColonne, grids]);
+
+  useEffect(() => {
+    setHighlightedLocationId(null);
+    if (!debouncedGridSearch.trim() || !lieu) {
+      setSearchResults([]);
+      return;
+    }
+    fetch(`/api/items?search=${encodeURIComponent(debouncedGridSearch)}&status=actif`)
+      .then(r => r.json())
+      .then(items => {
+        const results = items
+          .filter((i: { location: { lieu: string } | null }) => i.location && i.location.lieu === lieu)
+          .map((i: { id: number; name: string; locationId: number; location: { emplacement: string; ligne: string; colonne: number } }) => ({
+            id: i.id,
+            name: i.name,
+            locationId: i.locationId,
+            emplacement: i.location.emplacement,
+            ligne: i.location.ligne,
+            colonne: i.location.colonne,
+          }));
+        setSearchResults(results);
+      });
+  }, [debouncedGridSearch, lieu]);
+
+  const handleSelectSearchResult = (result: typeof searchResults[0]) => {
+    setEmplacement(result.emplacement);
+    setHighlightedLocationId(result.locationId);
+  };
 
   // When a grid config exists for this emplacement, load it
   useEffect(() => {
@@ -122,11 +182,51 @@ export default function GridPlan() {
     }
   };
 
+  const handleRemoveItem = async (itemId: number) => {
+    if (!confirm("Retirer cet élément du casier ?")) return;
+    await fetch(`/api/items/${itemId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ locationId: null }),
+    });
+    if (selectedCell && cellLocationId) {
+      handleCellClick(selectedCell.ligne, selectedCell.colonne, cellLocationId);
+    }
+    loadGrids();
+  };
+
+  const loadUnassignedItems = async (search?: string) => {
+    const params = new URLSearchParams({ locationId: "none", status: "actif" });
+    if (search) params.set("search", search);
+    const items = await fetch(`/api/items?${params}`).then(r => r.json());
+    setUnassignedItems(items);
+  };
+
+  const handleAssignItem = async (itemId: number) => {
+    if (!cellLocationId) return;
+    setAssigningId(itemId);
+    await fetch(`/api/items/${itemId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ locationId: cellLocationId }),
+    });
+    setAssigningId(null);
+    setShowAssignExisting(false);
+    setAssignSearch("");
+    if (selectedCell) {
+      handleCellClick(selectedCell.ligne, selectedCell.colonne, cellLocationId);
+    }
+    loadGrids();
+  };
+
   const closeCell = () => {
     setSelectedCell(null);
     setCellItems([]);
     setCellLocationId(null);
     setShowAddItem(false);
+    setShowAssignExisting(false);
+    setShowQR(false);
+    setAssignSearch("");
   };
 
   const [editingGrid, setEditingGrid] = useState<GridConfig | null>(null);
@@ -221,6 +321,41 @@ export default function GridPlan() {
         </div>
       )}
 
+      {/* Search item on grid */}
+      {existingEmplacements.length > 0 && (
+        <div className="card">
+          <div className="relative">
+            <input
+              value={gridSearch}
+              onChange={e => setGridSearch(e.target.value)}
+              placeholder="Rechercher un élément sur le plan..."
+              className="input-field w-full"
+            />
+            {searchResults.length > 0 && (
+              <div className="absolute z-10 top-full left-0 right-0 mt-1 bg-garage-800 border border-garage-600 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                {searchResults.map(r => (
+                  <button
+                    key={r.id}
+                    onClick={() => { handleSelectSearchResult(r); setGridSearch(""); setSearchResults([]); }}
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-garage-700 transition-colors flex justify-between items-center ${
+                      r.locationId === highlightedLocationId ? "bg-accent/20" : ""
+                    }`}
+                  >
+                    <span className="text-garage-100 truncate">{r.name}</span>
+                    <span className="text-garage-400 text-xs shrink-0 ml-2">{r.emplacement}-{r.ligne}{r.colonne}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            {gridSearch && searchResults.length === 0 && (
+              <div className="absolute z-10 top-full left-0 right-0 mt-1 bg-garage-800 border border-garage-600 rounded-lg shadow-xl px-3 py-3 text-sm text-garage-500 text-center">
+                Aucun élément trouvé dans ce lieu
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Grid display */}
       {gridCells ? (
         <div className="card overflow-x-auto">
@@ -256,20 +391,28 @@ export default function GridPlan() {
                 <div className="w-10 h-20 flex items-center justify-center text-xs text-garage-100 font-bold shrink-0">
                   {String.fromCharCode(65 + ri)}
                 </div>
-                {row.map((cell, ci) => (
-                  <button
-                    key={ci}
-                    onClick={() => handleCellClick(cell.ligne, cell.colonne, cell.locationId)}
-                    className={`w-20 h-20 m-0.5 rounded-lg flex flex-col items-center justify-center text-xs transition-all hover:scale-105 shrink-0 ${
-                      cell.hasItems
-                        ? "bg-blue-900/60 border-2 border-blue-500 text-blue-100 hover:bg-blue-800/60"
-                        : "bg-garage-600/40 border-2 border-dashed border-garage-400 text-garage-200 hover:border-garage-300"
-                    }`}
-                  >
-                    <span className="font-mono font-semibold">{emplacement}-{cell.ligne}{cell.colonne}</span>
-                    {cell.hasItems && <span className="text-[10px] mt-0.5 text-blue-300">occupé</span>}
-                  </button>
-                ))}
+                {row.map((cell, ci) => {
+                  const isHighlighted = highlightedLocationId !== null && cell.locationId === highlightedLocationId;
+                  const isAnimating = animatingCell && animatingCell.ligne === cell.ligne && animatingCell.colonne === cell.colonne;
+                  return (
+                    <button
+                      key={ci}
+                      onClick={() => handleCellClick(cell.ligne, cell.colonne, cell.locationId)}
+                      className={`w-20 h-20 m-0.5 rounded-lg flex flex-col items-center justify-center text-xs transition-all hover:scale-105 shrink-0 ${
+                        isAnimating
+                          ? "bg-accent/40 border-2 border-accent text-accent ring-2 ring-accent/60 animate-[pulse-cell_0.8s_ease-in-out_3]"
+                          : isHighlighted
+                            ? "bg-accent/30 border-2 border-accent text-accent ring-2 ring-accent/50 scale-110"
+                            : cell.hasItems
+                              ? "bg-blue-900/60 border-2 border-blue-500 text-blue-100 hover:bg-blue-800/60"
+                              : "bg-garage-600/40 border-2 border-dashed border-garage-400 text-garage-200 hover:border-garage-300"
+                      }`}
+                    >
+                      <span className="font-mono font-semibold">{emplacement}-{cell.ligne}{cell.colonne}</span>
+                      {cell.hasItems && <span className="text-[10px] mt-0.5 text-blue-300">occupé</span>}
+                    </button>
+                  );
+                })}
               </div>
             ))}
           </div>
@@ -289,14 +432,35 @@ export default function GridPlan() {
       >
         {selectedCell && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm text-garage-400">
-                Contenu du casier {selectedCell.emplacement}-{selectedCell.ligne}{selectedCell.colonne}
-              </h3>
-              <button onClick={() => setShowAddItem(true)} className="btn-primary text-sm">
-                + Ajouter un élément
-              </button>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm text-garage-400">
+                  Contenu du casier {selectedCell.emplacement}-{selectedCell.ligne}{selectedCell.colonne}
+                </h3>
+                <button onClick={() => setShowQR(!showQR)} className="text-xs text-garage-400 hover:text-accent transition-colors" title="QR Code">
+                  QR
+                </button>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => { setShowAssignExisting(true); setShowAddItem(false); loadUnassignedItems(); }} className="btn-secondary text-sm">
+                  + Élément existant
+                </button>
+                <button onClick={() => { setShowAddItem(true); setShowAssignExisting(false); }} className="btn-primary text-sm">
+                  + Nouvel élément
+                </button>
+              </div>
             </div>
+
+            {showQR && (
+              <div className="flex flex-col items-center gap-2 py-2">
+                <img
+                  src={`/api/qrcode?text=${encodeURIComponent(`${typeof window !== "undefined" ? window.location.origin : ""}/parametrage?lieu=${encodeURIComponent(selectedCell.lieu)}&emplacement=${selectedCell.emplacement}&ligne=${selectedCell.ligne}&colonne=${selectedCell.colonne}`)}&size=200`}
+                  alt="QR Code"
+                  className="w-48 h-48 bg-white p-2 rounded-lg"
+                />
+                <p className="text-xs text-garage-400">Scannez pour voir le contenu du casier</p>
+              </div>
+            )}
 
             {cellItems.length === 0 ? (
               <p className="text-garage-500 text-center py-6">Casier vide</p>
@@ -305,20 +469,73 @@ export default function GridPlan() {
                 {cellItems.map(item => (
                   <div key={item.id} className="flex items-center gap-3 bg-garage-700 rounded-lg px-3 py-2">
                     <ImageZoom src={item.photo || ""} alt={item.name} />
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm">{item.name}</h4>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-sm truncate">{item.name}</h4>
                       <p className="text-xs text-garage-400">{item.category.name} — {item.quantity} {item.unit}</p>
                     </div>
+                    <button
+                      onClick={() => handleRemoveItem(item.id)}
+                      className="text-xs text-garage-400 hover:text-red-400 transition-colors shrink-0"
+                      title="Retirer du casier"
+                    >
+                      Retirer
+                    </button>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {showAssignExisting && cellLocationId && (
+              <div className="border-t border-garage-700 pt-4">
+                <h3 className="text-sm font-semibold text-accent mb-3">Ajouter un élément existant</h3>
+                <input
+                  value={assignSearch}
+                  onChange={e => { setAssignSearch(e.target.value); loadUnassignedItems(e.target.value); }}
+                  placeholder="Rechercher un élément sans casier..."
+                  className="input-field w-full mb-3"
+                />
+                {unassignedItems.length === 0 ? (
+                  <p className="text-garage-500 text-center py-4 text-sm">Aucun élément sans casier trouvé</p>
+                ) : (
+                  <div className="space-y-1 max-h-60 overflow-y-auto">
+                    {unassignedItems.map(item => (
+                      <div key={item.id} className="flex items-center gap-3 bg-garage-700 rounded-lg px-3 py-2">
+                        {item.photo && <img src={item.photo} alt={item.name} className="w-8 h-8 object-cover rounded" />}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm truncate">{item.name}</h4>
+                          <p className="text-xs text-garage-400">{item.category.name} — {item.quantity} {item.unit}</p>
+                        </div>
+                        <button
+                          onClick={() => handleAssignItem(item.id)}
+                          disabled={assigningId === item.id}
+                          className="btn-primary text-xs px-2 py-1 shrink-0"
+                        >
+                          {assigningId === item.id ? "..." : "Assigner"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="flex justify-end pt-3">
+                  <button onClick={() => { setShowAssignExisting(false); setAssignSearch(""); }} className="btn-secondary text-sm">Annuler</button>
+                </div>
               </div>
             )}
 
             {showAddItem && cellLocationId && (
               <div className="border-t border-garage-700 pt-4">
                 <h3 className="text-sm font-semibold text-accent mb-3">Ajouter un élément</h3>
+                <div className="mb-3">
+                  <label className="block text-sm text-garage-300 mb-1">Type</label>
+                  <select value={addItemReference} onChange={e => setAddItemReference(e.target.value)} className="select-field w-full">
+                    <option value="Outils">Outils</option>
+                    <option value="Materiels">Matériels</option>
+                    <option value="Consommables">Consommables</option>
+                  </select>
+                </div>
                 <ItemForm
-                  reference="Outils"
+                  key={addItemReference}
+                  reference={addItemReference}
                   presetLocationId={cellLocationId}
                   onSave={() => {
                     setShowAddItem(false);

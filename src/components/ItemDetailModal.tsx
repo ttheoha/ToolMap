@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Modal from "./Modal";
 import ImageZoom from "./ImageZoom";
 
@@ -27,12 +28,14 @@ interface Props {
 }
 
 export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
+  const router = useRouter();
   const [item, setItem] = useState<ItemDetail | null>(null);
   const [loanForm, setLoanForm] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [expectedReturn, setExpectedReturn] = useState("");
   const [savingPhoto, setSavingPhoto] = useState(false);
+  const [showQR, setShowQR] = useState(false);
   const [editQty, setEditQty] = useState<number>(0);
   const [editMinStock, setEditMinStock] = useState<number | "">(0);
   const [savingStock, setSavingStock] = useState(false);
@@ -133,14 +136,33 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !item) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("La photo ne doit pas dépasser 2 Mo");
+      return;
+    }
     setSavingPhoto(true);
     const reader = new FileReader();
     reader.onload = async () => {
-      const photo = reader.result as string;
+      const base64 = reader.result as string;
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photo: base64 }),
+      });
+      if (!uploadRes.ok) {
+        alert("Erreur lors de l'upload de la photo");
+        setSavingPhoto(false);
+        return;
+      }
+      const { path } = await uploadRes.json();
+      // Delete old photo file if it was a file path
+      if (item.photo && item.photo.includes("/uploads/")) {
+        await fetch("/api/upload", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: item.photo }) });
+      }
       await fetch(`/api/items/${item.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ photo }),
+        body: JSON.stringify({ photo: path }),
       });
       const updated = await fetch(`/api/items/${item.id}`).then(r => r.json());
       setItem(updated);
@@ -154,6 +176,10 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
   const handlePhotoDelete = async () => {
     if (!item || !confirm("Supprimer la photo ?")) return;
     setSavingPhoto(true);
+    // Delete photo file if it was a file path
+    if (item.photo && item.photo.includes("/uploads/")) {
+      await fetch("/api/upload", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: item.photo }) });
+    }
     await fetch(`/api/items/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -205,11 +231,47 @@ export default function ItemDetailModal({ itemId, onClose, onRefresh }: Props) {
                 item.status === "vendu" ? "bg-red-900 text-red-300" :
                 "bg-yellow-900 text-yellow-300"
               }`}>{item.status}</span>
+              <button
+                type="button"
+                onClick={() => setShowQR(!showQR)}
+                className="px-2 py-0.5 rounded text-xs font-medium bg-garage-600 text-garage-300 hover:text-accent transition-colors"
+              >
+                QR
+              </button>
             </div>
+            {showQR && (
+              <div className="flex flex-col items-center gap-1 py-2">
+                <img
+                  src={`/api/qrcode?text=${encodeURIComponent(`${typeof window !== "undefined" ? window.location.origin : ""}/parametrage?lieu=${item.location ? encodeURIComponent(item.location.lieu) : ""}&emplacement=${item.location?.emplacement || ""}&ligne=${item.location?.ligne || ""}&colonne=${item.location?.colonne || ""}`)}&size=160`}
+                  alt="QR Code"
+                  className="w-40 h-40 bg-white p-2 rounded-lg"
+                />
+                <p className="text-xs text-garage-400">{item.name}</p>
+              </div>
+            )}
             <p className="text-garage-300 text-sm">{item.description || "Aucune description"}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
               <div><span className="text-garage-400">Quantité:</span> {item.quantity} {item.unit}</div>
-              <div><span className="text-garage-400">Emplacement:</span> {item.location ? `${item.location.lieu} - ${item.location.emplacement}-${item.location.ligne}${item.location.colonne}` : "Non assigné"}</div>
+              <div className="flex items-center gap-2">
+                <span className="text-garage-400">Emplacement:</span>
+                {item.location ? (
+                  <>
+                    <span>{item.location.lieu} - {item.location.emplacement}-{item.location.ligne}{item.location.colonne}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        router.push(`/parametrage?lieu=${encodeURIComponent(item.location!.lieu)}&emplacement=${item.location!.emplacement}&ligne=${item.location!.ligne}&colonne=${item.location!.colonne}`);
+                      }}
+                      className="text-xs text-accent hover:text-accent/80 transition-colors font-medium"
+                    >
+                      Localiser
+                    </button>
+                  </>
+                ) : (
+                  <span>Non assigné</span>
+                )}
+              </div>
             </div>
           </div>
         </div>

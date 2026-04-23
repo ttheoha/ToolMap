@@ -1,17 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import CategoriesManager from "@/components/CategoriesManager";
 import GridPlan from "@/components/GridPlan";
 import LocationsManager from "@/components/LocationsManager";
 import BackupRestore from "@/components/BackupRestore";
+import ImportCSV from "@/components/ImportCSV";
 import ThemeToggle from "@/components/ThemeToggle";
 
-export default function ParametragePage() {
+function ParametrageContent() {
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState<"plan" | "lieux" | "categories" | "backup">("plan");
+  const initialLieu = searchParams.get("lieu") || undefined;
+  const initialEmplacement = searchParams.get("emplacement") || undefined;
+  const initialLigne = searchParams.get("ligne") || undefined;
+  const initialColonne = searchParams.get("colonne") ? Number(searchParams.get("colonne")) : undefined;
+
+  useEffect(() => {
+    if (initialLieu) setTab("plan");
+  }, [initialLieu]);
 
   return (
-    <div className="space-y-6">
+    <>
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-xl md:text-2xl font-bold text-accent">Paramétrage</h1>
       </div>
@@ -53,10 +64,25 @@ export default function ParametragePage() {
         </button>
       </div>
 
-      {tab === "plan" && <GridPlan />}
+      {tab === "plan" && <GridPlan initialLieu={initialLieu} initialEmplacement={initialEmplacement} initialLigne={initialLigne} initialColonne={initialColonne} />}
       {tab === "lieux" && <LocationsManager />}
       {tab === "categories" && <CategoriesManager />}
-      {tab === "backup" && <BackupRestore />}
+      {tab === "backup" && (
+        <div className="space-y-6">
+          <BackupRestore />
+          <ImportCSV />
+        </div>
+      )}
+    </>
+  );
+}
+
+export default function ParametragePage() {
+  return (
+    <div className="space-y-6">
+      <Suspense fallback={<div className="text-garage-400 text-center py-8">Chargement...</div>}>
+        <ParametrageContent />
+      </Suspense>
     </div>
   );
 }

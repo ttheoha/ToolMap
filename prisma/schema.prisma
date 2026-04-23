@@ -51,7 +51,7 @@ model Item {
   id          Int        @id @default(autoincrement())
   name        String     @db.VarChar(200)
   reference   String     @db.VarChar(50) // Outils, Materiels, Consommables
-  photo       String?    @db.LongText    // Base64 encoded image
+  photo       String?    @db.Text         // File path (/uploads/...) or legacy base64
   description String?    @db.Text
   quantity    Int        @default(1)
   minStock    Int?       // Seuil de stock minimum (consommables uniquement)
@@ -74,8 +74,8 @@ model Item {
 
 model Movement {
   id          Int      @id @default(autoincrement())
-  itemId      Int
-  item        Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId      Int?
+  item        Item?    @relation(fields: [itemId], references: [id], onDelete: SetNull)
   type        String   @db.VarChar(30) // Ajout, Modif, Suppression, Pret, Rendu, Vendu, Vide
   description String?  @db.Text
   createdAt   DateTime @default(now())

@@ -18,13 +18,40 @@ export async function GET(request: NextRequest) {
   } else {
     where.status = status;
   }
-  if (locationId) where.locationId = parseInt(locationId);
+  if (locationId === "none") {
+    where.locationId = null;
+  } else if (locationId) {
+    where.locationId = parseInt(locationId);
+  }
   if (search) {
     where.OR = [
       { name: { contains: search } },
       { category: { name: { contains: search } } },
       { reference: { contains: search } },
     ];
+  }
+
+  const page = sp.get("page") ? parseInt(sp.get("page")!) : null;
+  const limit = sp.get("limit") ? parseInt(sp.get("limit")!) : null;
+
+  const orderBy = [{ category: { name: "asc" as const } }, { name: "asc" as const }];
+
+  if (page && limit) {
+    const [items, total] = await Promise.all([
+      prisma.item.findMany({
+        where,
+        include: {
+          category: true,
+          location: true,
+          _count: { select: { loans: { where: { status: "en_cours" } } } },
+        },
+        orderBy,
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.item.count({ where }),
+    ]);
+    return NextResponse.json({ items, total, page, totalPages: Math.ceil(total / limit) });
   }
 
   const items = await prisma.item.findMany({
@@ -34,7 +61,7 @@ export async function GET(request: NextRequest) {
       location: true,
       _count: { select: { loans: { where: { status: "en_cours" } } } },
     },
-    orderBy: [{ category: { name: "asc" } }, { name: "asc" }],
+    orderBy,
   });
 
   // Deduplicate by ID

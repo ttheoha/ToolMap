@@ -20,18 +20,18 @@ export async function GET(request: NextRequest) {
 
   // Filter by reference client-side if needed
   const filtered = reference
-    ? movements.filter(m => m.item.reference === reference)
+    ? movements.filter(m => m.item?.reference === reference || (!m.item && m.description?.includes(reference)))
     : movements;
 
   // Build CSV
   const header = "Date,Article,Reference,Type,Description,Statut";
   const rows = filtered.map(m => {
     const date = new Date(m.createdAt).toLocaleString("fr-FR");
-    const name = `"${(m.item.name || "").replace(/"/g, '""')}"`;
-    const ref = m.item.reference;
+    const name = `"${(m.item?.name || "—").replace(/"/g, '""')}"`;
+    const ref = m.item?.reference || "—";
     const type = m.type;
     const desc = `"${(m.description || "").replace(/"/g, '""')}"`;
-    const status = m.item.status;
+    const status = m.item?.status || "supprimé";
     return `${date},${name},${ref},${type},${desc},${status}`;
   });
 

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { readFile, writeFile, mkdir } from "fs/promises";
+import path from "path";
+import crypto from "crypto";
 
 export const config = {
   api: {
@@ -11,8 +14,9 @@ export const config = {
 
 // Export full database as JSON
 export async function GET() {
-  const [categories, items, locations, gridConfigs, movements, loans] = await Promise.all([
+  const [categories, lieux, items, locations, gridConfigs, movements, loans] = await Promise.all([
     prisma.category.findMany(),
+    prisma.lieu.findMany(),
     prisma.item.findMany(),
     prisma.location.findMany(),
     prisma.gridConfig.findMany(),
@@ -20,10 +24,32 @@ export async function GET() {
     prisma.loan.findMany(),
   ]);
 
+  // Embed photo files as base64 in backup
+  const itemsWithPhotos = await Promise.all(
+    items.map(async (item) => {
+      if (item.photo) {
+        // Extract filename from /api/uploads/xxx or /uploads/xxx
+        const fnMatch = item.photo.match(/\/(?:api\/)?uploads\/([^/]+)$/);
+        if (fnMatch) {
+          try {
+            const filePath = path.join(process.cwd(), "public", "uploads", fnMatch[1]);
+            const buffer = await readFile(filePath);
+            const ext = path.extname(fnMatch[1]).slice(1);
+            const mime = ext === "jpg" ? "jpeg" : ext;
+            return { ...item, _photoBase64: `data:image/${mime};base64,${buffer.toString("base64")}` };
+          } catch {
+            return item;
+          }
+        }
+      }
+      return item;
+    })
+  );
+
   const backup = {
     version: "1.0",
     date: new Date().toISOString(),
-    data: { categories, locations, gridConfigs, items, movements, loans },
+    data: { categories, lieux, locations, gridConfigs, items: itemsWithPhotos, movements, loans },
   };
 
   const json = JSON.stringify(backup, null, 2);
@@ -41,11 +67,25 @@ export async function POST(request: NextRequest) {
   try {
     const backup = await request.json();
 
-    if (!backup.data) {
-      return NextResponse.json({ error: "Format de sauvegarde invalide" }, { status: 400 });
+    if (!backup.data || typeof backup.data !== "object") {
+      return NextResponse.json({ error: "Format de sauvegarde invalide : champ 'data' manquant" }, { status: 400 });
     }
 
-    const { categories, locations, gridConfigs, items, movements, loans } = backup.data;
+    const requiredKeys = ["categories", "items"];
+    const missingKeys = requiredKeys.filter(k => !Array.isArray(backup.data[k]));
+    if (missingKeys.length > 0) {
+      return NextResponse.json({ error: `Format de sauvegarde invalide : clés manquantes (${missingKeys.join(", ")})` }, { status: 400 });
+    }
+
+    // Validate items structure (spot check first item)
+    if (backup.data.items.length > 0) {
+      const sample = backup.data.items[0];
+      if (!sample.name || !sample.reference || sample.categoryId === undefined) {
+        return NextResponse.json({ error: "Format de sauvegarde invalide : structure des items incorrecte" }, { status: 400 });
+      }
+    }
+
+    const { categories, lieux, locations, gridConfigs, items, movements, loans } = backup.data;
 
     // Delete all existing data in reverse dependency order
     await prisma.movement.deleteMany();
@@ -54,6 +94,7 @@ export async function POST(request: NextRequest) {
     await prisma.location.deleteMany();
     await prisma.gridConfig.deleteMany();
     await prisma.category.deleteMany();
+    await prisma.lieu.deleteMany();
 
     // Restore in dependency order
     if (categories?.length) {
@@ -62,6 +103,14 @@ export async function POST(request: NextRequest) {
         name: c.name as string,
         reference: c.reference as string,
         createdAt: new Date(c.createdAt as string),
+      }))});
+    }
+
+    if (lieux?.length) {
+      await prisma.lieu.createMany({ data: lieux.map((l: Record<string, unknown>) => ({
+        id: l.id as number,
+        name: l.name as string,
+        createdAt: new Date(l.createdAt as string),
       }))});
     }
 
@@ -88,27 +137,65 @@ export async function POST(request: NextRequest) {
     }
 
     if (items?.length) {
-      await prisma.item.createMany({ data: items.map((i: Record<string, unknown>) => ({
-        id: i.id as number,
-        name: i.name as string,
-        reference: i.reference as string,
-        photo: (i.photo as string) || null,
-        description: (i.description as string) || null,
-        quantity: i.quantity as number,
-        minStock: (i.minStock as number) || null,
-        unit: i.unit as string,
-        categoryId: i.categoryId as number,
-        locationId: (i.locationId as number) || null,
-        status: i.status as string,
-        createdAt: new Date(i.createdAt as string),
-        updatedAt: new Date(i.updatedAt as string),
-      }))});
+      const uploadsDir = path.join(process.cwd(), "public", "uploads");
+      await mkdir(uploadsDir, { recursive: true });
+
+      // Helper to write base64 image to disk
+      const saveBase64ToDisk = async (base64: string): Promise<string | null> => {
+        try {
+          const match = base64.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+          if (!match) return null;
+          const ext = match[1] === "jpeg" ? "jpg" : match[1].replace("+", "");
+          const buffer = Buffer.from(match[2], "base64");
+          if (buffer.length < 100) return null; // Skip truncated/corrupt data
+          const filename = `${crypto.randomUUID()}.${ext}`;
+          await writeFile(path.join(uploadsDir, filename), buffer);
+          return `/api/uploads/${filename}`;
+        } catch {
+          return null;
+        }
+      };
+
+      // Restore photos from base64 to filesystem
+      const itemsData = await Promise.all(items.map(async (i: Record<string, unknown>) => {
+        let photo = (i.photo as string) || null;
+        const photoBase64 = i._photoBase64 as string | undefined;
+
+        if (photoBase64) {
+          // Backup contains embedded base64 photo — write it to disk
+          const saved = await saveBase64ToDisk(photoBase64);
+          if (saved) photo = saved;
+        } else if (photo && photo.startsWith("data:image/")) {
+          // Legacy backup with base64 directly in photo field — write to disk
+          const saved = await saveBase64ToDisk(photo);
+          if (saved) photo = saved;
+          else photo = null; // Truncated/corrupt — discard
+        }
+
+        return {
+          id: i.id as number,
+          name: i.name as string,
+          reference: i.reference as string,
+          photo,
+          description: (i.description as string) || null,
+          quantity: i.quantity as number,
+          minStock: i.minStock != null ? Number(i.minStock) : null,
+          unit: i.unit as string,
+          categoryId: i.categoryId as number,
+          locationId: i.locationId != null ? Number(i.locationId) : null,
+          status: i.status as string,
+          createdAt: new Date(i.createdAt as string),
+          updatedAt: new Date(i.updatedAt as string),
+        };
+      }));
+
+      await prisma.item.createMany({ data: itemsData });
     }
 
     if (movements?.length) {
       await prisma.movement.createMany({ data: movements.map((m: Record<string, unknown>) => ({
         id: m.id as number,
-        itemId: m.itemId as number,
+        itemId: m.itemId != null ? (m.itemId as number) : null,
         type: m.type as string,
         description: (m.description as string) || null,
         createdAt: new Date(m.createdAt as string),

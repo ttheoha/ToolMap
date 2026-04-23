@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+let cache: { data: unknown; timestamp: number } | null = null;
+const CACHE_TTL = 10_000; // 10 seconds
+
 export async function GET() {
+  if (cache && Date.now() - cache.timestamp < CACHE_TTL) {
+    return NextResponse.json(cache.data);
+  }
   // Top 5 outils les plus utilisés (par nombre de mouvements)
   const topOutils = await prisma.item.findMany({
     where: { reference: "Outils", status: "actif" },
@@ -25,12 +31,16 @@ export async function GET() {
     orderBy: { loanDate: "desc" },
   });
 
-  // Consommables en stock bas (quantity <= minStock)
+  // Consommables en stock bas (quantity <= minStock) ou vides
   const allConsommables = await prisma.item.findMany({
     where: {
       reference: "Consommables",
-      status: "actif",
-      minStock: { not: null },
+      status: { in: ["actif", "vide"] },
+      OR: [
+        { minStock: { not: null } },
+        { status: "vide" },
+        { quantity: 0 },
+      ],
     },
     include: {
       category: { select: { name: true } },
@@ -40,13 +50,14 @@ export async function GET() {
   });
 
   const lowStockConsommables = allConsommables
-    .filter(c => c.minStock !== null && c.quantity <= c.minStock)
+    .filter(c => c.status === "vide" || c.quantity === 0 || (c.minStock !== null && c.quantity <= c.minStock))
     .map(c => ({
       id: c.id,
       name: c.name,
       quantity: c.quantity,
       minStock: c.minStock,
       unit: c.unit,
+      status: c.status,
       category: c.category.name,
       location: c.location
         ? `${c.location.lieu} - ${c.location.emplacement}-${c.location.ligne}${c.location.colonne}`
@@ -59,11 +70,14 @@ export async function GET() {
   const totalMateriels = await prisma.item.count({ where: { reference: "Materiels", status: "actif" } });
   const totalConsommables = await prisma.item.count({ where: { reference: "Consommables", status: "actif" } });
 
-  return NextResponse.json({
+  const result = {
     topOutils: topOutils.map((i) => ({ name: i.name, value: i._count.history })),
     topConsommables: topConsommables.map((i) => ({ name: i.name, value: i._count.history })),
     activeLoans,
     lowStockConsommables,
     stats: { totalItems, totalOutils, totalMateriels, totalConsommables },
-  });
+  };
+
+  cache = { data: result, timestamp: Date.now() };
+  return NextResponse.json(result);
 }
